@@ -99,3 +99,18 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# PyCharm
+.idea
+
+# VSCode
+.vscode
+
+# macOS
+.DS_Store
+
+# Data
+data
+behavior_info.txt
+product_info.txt
+user_info.txt
