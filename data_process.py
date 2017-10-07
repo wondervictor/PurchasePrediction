@@ -2,6 +2,8 @@
 
 import time
 import os
+import sys
+import re
 
 import numpy as np
 
@@ -87,31 +89,64 @@ def process_user_behaviors():
     return behavior_elements
 
 
-def build_dict(word_set, dict_file):
+UNK_ID = 0
+__UNK__ = '<UNK>'
+# UNK: ~,@,#,:,','
 
-    word_dict = dict()
+# 移除特殊字符
+def clear_special_chars(word_set):
+
+    specials = ['~', '@', ',', '【', '】', '#', '$', '%', '&', '', ' ', '!', '+', '-', '/', '*',
+                ':', ';', '?', '{', '}', '¥', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                '(', ')', '<', '>', '=', '|', 'a', '《', '》', '。']
+
+    for spec in specials:
+        if spec in word_set:
+            del word_set[spec]
+
+# 移除描述中的数字
+def remove_digits(in_str):
+    pattern = '[0-9]\d*'
+    result = re.compile(pattern).findall(in_str)
+    if len(result):
+        return False
+
+    return True
+
+
+def build_dict(word_set, dict_file, size=60000):
+
+    word_list = [__UNK__]
     if not os.path.exists(dict_file):
-        index = 0
-        while len(word_set):
-            word = word_set.pop()
-            word_dict[word] = index
-            index += 1
-        with open(dict_file, 'w+') as f:
-            for key in word_dict.keys():
-                f.write('%s:%s\n' % (key, word_dict[key]))
-    else:
-        with open(dict_file, 'r') as f:
-            lines = f.readlines()
-            for line in lines:
+        clear_special_chars(word_set)
+        word_list += sorted(word_set, key=word_set.get, reverse=True)
+        if len(word_list) > size:
+            word_list = word_list[:size]
 
-                key, index = line.rstrip('\n').split(':')
-                word_dict[key] = int(index)
+        with open(dict_file, 'w+') as f:
+            content = '\n'.join(word_list)
+            f.write(content)
+    del word_set
+    del word_list
+
+    with open(dict_file, 'r') as f:
+        lines = f.readlines()
+        word_list = [token.rstrip('\n') for token in lines]
+        del lines
+        word_dict = dict([(x, y) for (y, x) in enumerate(word_list)])
+
+    del word_list
+
     return word_dict
 
 
-def process_products_info():
-
-    word_bag = set()
+def process_raw_products_info():
+    """
+    处理原始Product信息，将其信息提取成为以下格式
+    商品ID,商家ID,品牌ID,类型ID,价格,描述xx:xx:xxx:xxx
+    xxx已使用词典进行数字化
+    """
+    word_bag = dict()
 
     data_path = 'data/product_info.txt'
 
@@ -126,22 +161,40 @@ def process_products_info():
         title = line[4].split(' ')
         product.append(title)
         product.append(int(line[-1]))
+
         for t in title:
-            word_bag.add(t)
+            if remove_digits(t):
+                if t not in word_bag:
+                    word_bag[t] = 0
+                word_bag[t] += 1
 
         products.append(product)
-
+    print(len(word_bag))
     dictionary = build_dict(word_bag, 'data/word.dict')
+
+    output_file = open('data/products.txt', 'w+')
 
     for product in products:
 
         title = product[4]
-        title = [dictionary[x] for x in title]
+        # for ti in title:
+        #     print("%s: %s" % (ti, dictionary.get(ti, UNK_ID)))
+        title = [dictionary.get(x, UNK_ID) for x in title]
         product[4] = title
+        line = ','.join(['%s' % x for x in product[:4]])
+        line += ','
+        line += '%s,' % product[5]
+        line += ':'.join(['%s' % x for x in title])
+        line += '\n'
+
+        output_file.write(line)
+
+    output_file.close()
 
     return products
 
 
+process_raw_products_info()
 
 
 
