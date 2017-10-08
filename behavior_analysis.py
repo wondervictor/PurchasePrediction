@@ -5,6 +5,7 @@ import datetime
 from data_process import process_user_behaviors
 import output
 
+
 # date convension
 
 def date_to_timestamp(date):
@@ -73,7 +74,7 @@ def remove_purchased(purchased, shopping_cart):
 
     def _filter(element):
         for pur_ele in purchased:
-            if element[0] == pur_ele[0] and  element[1] == pur_ele[1] and element[2] < pur_ele[2]:
+            if element[0] == pur_ele[0] and element[1] == pur_ele[1] and element[2] < pur_ele[2]:
                 return True
 
         return False
@@ -100,12 +101,12 @@ def split_action_behaviors():
     write_to_file(action_four_behavior, dir_path+'action_4.txt')
 
 
-def split_seven_days_3_behavior():
+def split_four_days_3_behavior():
     """
-    获取7天，用户加入购物车的商品，排除已经购买的
+    获取4天，用户加入购物车的商品，排除已经购买的
     :return:
     """
-    start_time = '2017-8-18 00:00:00'
+    start_time = '2017-8-22 00:00:00'
     end_time = '2017-8-25 23:59:59'
 
     start_time = date_to_timestamp(start_time)
@@ -115,8 +116,8 @@ def split_seven_days_3_behavior():
     seven_days = filter_time(behaviors, start_time, end_time)
     shopping_cart = filter_user_action(3, seven_days)
     purchased = filter_user_action(4, seven_days)
-    del behaviors
-    del seven_days
+    print("start to remove")
+    print(len(purchased), len(shopping_cart))
     _shopping = remove_purchased(purchased, shopping_cart)
 
     result = [(x[0], x[1]) for x in _shopping]
@@ -124,8 +125,7 @@ def split_seven_days_3_behavior():
 
 
 if __name__ == '__main__':
-    split_action_behaviors()
-    split_seven_days_3_behavior()
+    split_four_days_3_behavior()
 
 
 

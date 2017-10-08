@@ -18,6 +18,6 @@ def output_result(pred_user_behaviors):
 
         for tup in pred_user_behaviors:
 
-            f.write('%s\t%s\n', tup[0], tup[1])
+            f.write('%s\t%s\n'%(tup[0], tup[1]))
 
 

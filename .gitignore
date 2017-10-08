@@ -113,4 +113,7 @@ ENV/
 data
 behavior_info.txt
 product_info.txt
-user_info.txt
+user_info.txti
+
+# Output
+output
