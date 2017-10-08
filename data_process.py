@@ -75,12 +75,10 @@ def process_user_info():
 
 
 # Process User Behaviors 4583371
-def process_user_behaviors():
-
-    data_path = 'data/behavior_info.txt'
+def process_user_behaviors(data_path='data/behavior_info.txt'):
 
     with open(data_path, 'r') as f:
-        behavior_lines = f.readlines()
+        behavior_lines = f.readlines()[:-1]
 
     behavior_elements = [map(int, split_t(x)) for x in behavior_lines]
 
@@ -93,6 +91,7 @@ UNK_ID = 0
 __UNK__ = '<UNK>'
 # UNK: ~,@,#,:,','
 
+
 # 移除特殊字符
 def clear_special_chars(word_set):
 
@@ -103,6 +102,7 @@ def clear_special_chars(word_set):
     for spec in specials:
         if spec in word_set:
             del word_set[spec]
+
 
 # 移除描述中的数字
 def remove_digits(in_str):
@@ -177,8 +177,7 @@ def process_raw_products_info():
     for product in products:
 
         title = product[4]
-        # for ti in title:
-        #     print("%s: %s" % (ti, dictionary.get(ti, UNK_ID)))
+
         title = [dictionary.get(x, UNK_ID) for x in title]
         product[4] = title
         line = ','.join(['%s' % x for x in product[:4]])
@@ -194,7 +193,7 @@ def process_raw_products_info():
     return products
 
 
-process_raw_products_info()
+
 
 
 
