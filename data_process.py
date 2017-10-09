@@ -10,19 +10,22 @@ import numpy as np
 
 class User(object):
 
-    def __init__(self, id, rank, gender, birth_date, age, baby_birth_date, baby_age=0, baby_gender=-99):
+    def __init__(self, id, rank, gender, has_baby, baby_birth_date, baby_age=0, baby_gender=-99):
         self.id = id
         self.rank = rank
         self.gender = gender
-        self.birth_date = birth_date
-        self.age = age
+        self.has_baby = has_baby
         self.baby_birth_date = baby_birth_date
         self.baby_age = baby_age
         self.baby_gender = baby_gender
 
+    def __str__(self):
+        return "[id]: %s [rank]: %s [gender]: %s [has_baby]: %s [baby_birth]: %s [baby_age]: %s [baby_gender]: %s" % \
+               (self.id, self.rank, self.gender, self.has_baby, self.baby_birth_date, self.baby_age, self.baby_gender)
+
 
 def date_timestamp(date):
-    if len(date) == 0:
+    if len(date) == 0 or date == '-99':
         return -1
     pattern = '%Y-%m-%d %H:%M:%S'
     strptime = time.strptime(date, pattern)
@@ -36,9 +39,30 @@ def split_t(line):
     return line_elements
 
 
-def process_user_info():
+def preprocess_user_info():
 
     data_path = 'data/user_info.txt'
+
+    with open(data_path, 'r') as f:
+        user_lines = f.readlines()
+
+    def map_func(x):
+        x = split_t(x)
+        return x[:3]+ x[5:]
+
+    user_elements = [map_func(x) for x in user_lines]
+
+    with open('data/user_info_clear.txt', 'w+') as f:
+        for element in user_elements:
+            line = '\t'.join(element)
+            line += '\n'
+            f.write(line)
+    print("Clear User Info Data")
+
+
+def process_user_info():
+
+    data_path = 'data/user_info_clear.txt'
 
     with open(data_path, 'r') as f:
         user_lines = f.readlines()
@@ -52,25 +76,26 @@ def process_user_info():
         user_id = int(user_info[0])
         user_rank = int(user_info[1])
         user_gender = int(user_info[2])
-        user_birth = date_timestamp(user_info[3])
-        user_age = int(user_info[4])
-        user_baby_birth = date_timestamp(user_info[5])
-        user_baby_age = int(user_info[6])
-        user_baby_gender = int(user_info[7])
+        has_baby = False
+        user_baby_birth = date_timestamp(user_info[3])
+        if user_baby_birth != -1:
+            has_baby = True
+            user_baby_age = int(user_info[4])
+            user_baby_gender = int(user_info[5])
+        else:
+            user_baby_age = 0
+            user_baby_gender = -99
 
         user = User(
-            user_id,
-            user_rank,
-            user_gender,
-            user_birth,
-            user_age,
-            user_baby_birth,
-            user_baby_age,
-            user_baby_gender
+            id=user_id,
+            rank=user_rank,
+            gender=user_gender,
+            has_baby=has_baby,
+            baby_birth_date=user_baby_birth,
+            baby_age=user_baby_age,
+            baby_gender=user_baby_gender
         )
-
         users.append(user)
-
     return users
 
 
@@ -192,6 +217,9 @@ def process_raw_products_info():
 
     return products
 
+if __name__ == '__main__':
+
+    process_user_info()
 
 
 
