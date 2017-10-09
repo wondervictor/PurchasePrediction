@@ -9,6 +9,11 @@ import output
 # date convension
 
 def date_to_timestamp(date):
+    """
+    日期转时间戳
+    :param date:
+    :return:
+    """
     if len(date) == 0:
         return -1
     pattern = '%Y-%m-%d %H:%M:%S'
@@ -18,6 +23,11 @@ def date_to_timestamp(date):
 
 
 def timestamp_to_date(timestamp):
+    """
+    时间戳转日期
+    :param timestamp:
+    :return:
+    """
     date_ = datetime.datetime.fromtimestamp(timestamp)
     date_str = date_.strftime('%Y-%m-%d %H:%M:%S')
     return date_str
@@ -60,7 +70,13 @@ def filter_time(data, start_time, end_time=-1):
 
 
 def write_to_file(behaviors, filepath, timestamp=False):
-
+    """
+    将用户行为写入文件
+    :param behaviors:
+    :param filepath:
+    :param timestamp:
+    :return:
+    """
     with open(filepath, 'w+') as f:
 
         for element in behaviors:
@@ -84,11 +100,12 @@ def remove_purchased(purchased, shopping_cart):
     return _shopping
 
 
-
 def split_action_behaviors():
-
+    """
+    根据行为action拆分数据
+    :return:
+    """
     behaviors = process_user_behaviors()
-
     action_one_behavior = filter_user_action(1, behaviors)
     action_two_behavior = filter_user_action(2, behaviors)
     action_three_behavior = filter_user_action(3, behaviors)
@@ -124,8 +141,14 @@ def split_four_days_3_behavior():
     output.output_result(result)
 
 
-if __name__ == '__main__':
-    split_four_days_3_behavior()
+# 判断商品取消加入购物车
+
+def not_buying():
+    """0"""
+    pass
+
+
+
 
 
 

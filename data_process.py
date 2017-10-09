@@ -41,6 +41,11 @@ def split_t(line):
 
 def preprocess_user_info():
 
+    """
+    预处理用户信息，删除无效信息:出生年月、年龄
+    :return: [ID, Rank, Gender, Baby_Birth, Baby_Age, Baby_Gender]
+    """
+
     data_path = 'data/user_info.txt'
 
     with open(data_path, 'r') as f:
@@ -122,7 +127,7 @@ def clear_special_chars(word_set):
 
     specials = ['~', '@', ',', '【', '】', '#', '$', '%', '&', '', ' ', '!', '+', '-', '/', '*',
                 ':', ';', '?', '{', '}', '¥', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                '(', ')', '<', '>', '=', '|', 'a', '《', '》', '。']
+                '(', ')', '<', '>', '=', '|', 'a', '《', '》', '。', '的', '地', '得']
 
     for spec in specials:
         if spec in word_set:
@@ -194,16 +199,24 @@ def process_raw_products_info():
                 word_bag[t] += 1
 
         products.append(product)
-    print(len(word_bag))
+    print(len(products))
     dictionary = build_dict(word_bag, 'data/word.dict')
 
     output_file = open('data/products.txt', 'w+')
+
+    def filter_func(m):
+        s = []
+        for _element in m:
+            _element = dictionary.get(_element, UNK_ID)
+            if _element != 0:
+                s.append(_element)
+        return s
 
     for product in products:
 
         title = product[4]
 
-        title = [dictionary.get(x, UNK_ID) for x in title]
+        title = filter_func(title)
         product[4] = title
         line = ','.join(['%s' % x for x in product[:4]])
         line += ','
@@ -217,10 +230,30 @@ def process_raw_products_info():
 
     return products
 
-if __name__ == '__main__':
 
-    process_user_info()
+def process_product_info():
 
+    data_path = 'data/products.txt'
+
+    data = []
+    with open(data_path, 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            elements = line.rstrip('\n').split(',')
+            if len(elements[-1]):
+                describe_words = map(int, elements[-1].split(':'))
+            else:
+                describe_words = []
+            elements = map(int, elements[:-1])
+            elements.append(describe_words)
+            data.append(elements)
+
+    print(data[10])
+    return data
+
+
+# if __name__ == '__main__':
+#     process_product_info()
 
 
 
