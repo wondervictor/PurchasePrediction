@@ -27,7 +27,6 @@ class NeuralNetwork(nn.Module):
         self.product_layer = nn.Linear(PRODUCT_VECTOR_SIZE, 512)
 
 
-
     def forward(self, product_vector, user_vector):
 
         pass

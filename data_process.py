@@ -321,12 +321,13 @@ def remove_unactive(under_action=1):
     print("Clear Finished")
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
+#
+#     preprocess_user_info()
+#     process_raw_products_info()
+#     remove_unactive(1)
 
-    process_raw_products_info()
-    remove_unactive()
-    # data = process_product_info()
-    # print(len(data))
+
 
 
 

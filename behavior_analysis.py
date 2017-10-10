@@ -7,7 +7,6 @@ from data_process import process_user_behaviors
 import output
 
 """
-
 浏览记录：3986041
 收藏记录：5128
 加购记录：477142
@@ -15,9 +14,7 @@ import output
 
 分割训练集测试集依据:
 
-
 """
-
 
 # date convension
 
@@ -308,10 +305,14 @@ def generate_dataset(testing_size):
 
     return train_data, test_data
 
+#
+# if __name__ == '__main__':
+#
+#     split_action_behaviors()
+#     not_buying()
+#
 
-if __name__ == '__main__':
-    action_4 = process_user_behaviors('data/behaviors/action_4.txt')
-    print(len(action_4))
+
 
 
 
