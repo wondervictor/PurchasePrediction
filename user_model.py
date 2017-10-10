@@ -7,16 +7,17 @@ User Model
 from data_process import User
 
 
-def extract_features_from_merchandises(merchandises):
+def extract_features_from_product(products):
     """
     从商品中提取出人物特征：
 
     1. 综合特征(包含用户喜好、倾向)
     2. 用户消费水平
     3. 用户购物频率
-    :param merchandise:
+    :param products:
     :return:
     """
+
 
     pass
 

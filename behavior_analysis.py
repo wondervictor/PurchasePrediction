@@ -2,8 +2,21 @@
 
 import time
 import datetime
+import random
 from data_process import process_user_behaviors
 import output
+
+"""
+
+浏览记录：3986041
+收藏记录：5128
+加购记录：477142
+购买记录：115055
+
+分割训练集测试集依据:
+
+
+"""
 
 
 # date convension
@@ -188,7 +201,6 @@ def not_buying():
             unpurchased_data.append(dat)
         elif dat[1] not in purchased_dict[dat[0]]:
             unpurchased_data.append(dat)
-    del action_1_data
 
     print("Finish Action 1: %s" % len(unpurchased_data))
 
@@ -201,8 +213,6 @@ def not_buying():
         elif dat[1] not in purchased_dict[dat[0]]:
             unpurchased_data.append(dat)
 
-    del action_2_data
-
     print("Finish Action 2: %s" % len(unpurchased_data))
 
     action_3_data = process_user_behaviors('data/behaviors/action_3.txt')
@@ -212,7 +222,6 @@ def not_buying():
             unpurchased_data.append(dat)
         elif dat[1] not in purchased_dict[dat[0]]:
             unpurchased_data.append(dat)
-    del action_3_data
 
     print("Finish Action 3: %s" % len(unpurchased_data))
 
@@ -220,7 +229,7 @@ def not_buying():
 
     print("Not Buying: %s" % len(unpurchased_data))
 
-    write_to_file(unpurchased_data,'data/behaviors/notbuying.txt')
+    write_to_file(unpurchased_data, 'data/behaviors/notbuying.txt')
 
 
 def collect_user_product(action):
@@ -243,11 +252,67 @@ def collect_user_product(action):
     return user_product
 
 
+# 构造训练集:
+
+# 采样
+def sample_dataset(sample_num, dataset):
+    dataset_num = len(dataset)
+    sample_index = random.sample(range(dataset_num), sample_num)
+    dataset = [dataset[p] for p in sample_index]
+    return dataset
+
+
+def generate_dataset(testing_size):
+
+    buying_data = process_user_behaviors('data/behaviors/action_4.txt')
+    notbuying_data = process_user_behaviors('data/behaviors/notbuying.txt')
+
+    pos_num = len(buying_data)
+
+    notbuying_action_1 = filter_user_action(1, notbuying_data)
+    notbuying_action_2 = filter_user_action(2, notbuying_data)
+    notbuying_action_3 = filter_user_action(3, notbuying_data)
+
+    act_1_num = len(notbuying_action_1)
+    act_2_num = len(notbuying_action_2)
+    act_3_num = len(notbuying_action_3)
+
+    sample_1_num = pos_num * act_1_num / (act_1_num + act_2_num + act_3_num)
+    sample_2_num = pos_num * act_2_num / (act_1_num + act_2_num + act_3_num)
+    sample_3_num = pos_num * act_3_num / (act_1_num + act_2_num + act_3_num)
+
+    notbuying_action_1 = sample_dataset(sample_1_num, notbuying_action_1)
+    notbuying_action_2 = sample_dataset(sample_2_num, notbuying_action_2)
+    notbuying_action_3 = sample_dataset(sample_3_num, notbuying_action_3)
+
+    notbuying_data = notbuying_action_1 + notbuying_action_2 + notbuying_action_3
+
+    buying_data = [x.append(1) for x in buying_data]
+    notbuying_data = [x.append(0) for x in notbuying_data]
+
+    # shuffle
+    random.shuffle(buying_data)
+    random.shuffle(notbuying_data)
+
+    train_data_pos = buying_data[:-testing_size/2]
+    train_data_neg = notbuying_data[:-testing_size/2]
+
+    test_data_pos = buying_data[testing_size/2:]
+    test_data_neg = notbuying_data[testing_size/2:]
+
+    train_data = test_data_neg + train_data_pos
+    test_data = test_data_neg + test_data_pos
+
+    random.shuffle(train_data)
+    random.shuffle(test_data)
+
+    return train_data, test_data
+
 
 
 if __name__ == '__main__':
-    not_buying()
-
+    action_4 = process_user_behaviors('data/behaviors/action_4.txt')
+    print(len(action_4))
 
 
 

@@ -80,7 +80,6 @@ def process_user_info():
         user_id = int(user_info[0])
         user_rank = int(user_info[1])
         user_gender = int(user_info[2])
-        has_baby = False
 
         user_baby_age = int(user_info[4])
         user_baby_gender = int(user_info[5])
@@ -229,6 +228,10 @@ def process_raw_products_info():
 
 def process_product_info():
 
+    """
+    处理商品信息：
+    :return:商品ID,商家ID,品牌ID,类型ID,价格,描述[xx,xx,xxx,xxx]
+    """
     data_path = 'data/products.txt'
 
     data = []

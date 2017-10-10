@@ -22,6 +22,5 @@ def cf_person_based(rank):
     :return:
     """
 
-
     pass
 
