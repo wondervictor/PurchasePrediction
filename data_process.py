@@ -247,10 +247,10 @@ def process_product_info():
     return data
 
 
-def remove_unpurchased(under_action=1):
+def remove_unactive(under_action=1):
 
     """
-    删除不活跃商品
+    删除不活跃商品, 删除未被浏览过的商品
     :param under_action:
     :return:
     """
@@ -295,7 +295,7 @@ def remove_unpurchased(under_action=1):
     for i in range(len(all_merchandises)):
         element = all_merchandises[i]
         if element[0] in active_merchandise:
-            clear_merchandise.append(clear_merchandise)
+            clear_merchandise.append(element)
 
     all_merchandises = clear_merchandise
 
@@ -319,7 +319,8 @@ def remove_unpurchased(under_action=1):
 
 if __name__ == '__main__':
 
-    preprocess_user_info()
+    # data = process_product_info()
+    # print(len(data))
 
 
 
