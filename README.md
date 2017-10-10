@@ -5,7 +5,7 @@
 
 - [ ] 构造分类器 (Random Forest/XGBoost)
 
-- [ ] 可视化 (数量vesus价格、商品数vesus销量)
+- [ ] 可视化 (数量versus价格、商品数versus销量)
 
 - [ ] 商家评价
 

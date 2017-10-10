@@ -307,6 +307,7 @@ def remove_unactive(under_action=1):
 
     for data_ele in all_merchandises:
         line = ','.join(['%s' % x for x in data_ele[:5]])
+        line += ','
         line += ':'.join(['%s' % x for x in data_ele[5]])
         line += '\n'
 
@@ -319,6 +320,8 @@ def remove_unactive(under_action=1):
 
 if __name__ == '__main__':
 
+    process_raw_products_info()
+    remove_unactive()
     # data = process_product_info()
     # print(len(data))
 

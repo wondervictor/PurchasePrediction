@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-
+from scipy.spatial.distance import cosine
 
 
 def cf_product_based(all_products, user_product):
@@ -11,6 +11,17 @@ def cf_product_based(all_products, user_product):
     :param user_product: 用户已购买或者加购的商品
     :return:
     """
+
+    pass
+
+
+def cf_person_based(rank):
+    """
+    基于人的协同过滤
+    :rank: 选取rank名相似用户进行推荐
+    :return:
+    """
+
 
     pass
 
