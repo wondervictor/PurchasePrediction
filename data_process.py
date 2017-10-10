@@ -248,7 +248,6 @@ def process_product_info():
             elements.append(describe_words)
             data.append(elements)
 
-    print(data[10])
     return data
 
 

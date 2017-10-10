@@ -118,12 +118,12 @@ def split_action_behaviors():
     write_to_file(action_four_behavior, dir_path+'action_4.txt')
 
 
-def split_four_days_3_behavior():
+def split_five_days_3_behavior():
     """
     获取4天，用户加入购物车的商品，排除已经购买的
     :return:
     """
-    start_time = '2017-8-22 00:00:00'
+    start_time = '2017-8-21 00:00:00'
     end_time = '2017-8-25 23:59:59'
 
     start_time = date_to_timestamp(start_time)
@@ -144,8 +144,57 @@ def split_four_days_3_behavior():
 # 判断商品取消加入购物车
 
 def not_buying():
-    """0"""
-    pass
+
+    """
+    下次付款前未购买的商品
+    1. 加入购物车
+    2. 浏览的商品
+    3. 收藏的商品
+    :return:
+    """
+
+    purchased_data = process_user_behaviors('data/behaviors/action_4.txt')
+    shopcart_data = process_user_behaviors('data/behaviors/action_3.tx')
+
+    user_purchased = {}
+    user_shopcart = {}
+
+    for pur_ in purchased_data:
+        if pur_[0] not in user_purchased.keys():
+            user_purchased[pur_[0]] = set()
+
+        user_purchased[pur_[0]].add(pur_[1])
+
+    for cart_ in shopcart_data:
+        if cart_[0] not in user_shopcart.keys():
+            user_shopcart[cart_[0]] = set()
+
+            user_shopcart[cart_[0]].add(cart_[1])
+    for key in user_purchased.keys():
+        pass
+
+
+
+if __name__ == '__main__':
+    split_five_days_3_behavior()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
