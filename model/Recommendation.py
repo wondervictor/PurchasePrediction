@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-def cosine_distance(vec_a, vec_b):
-    pass
 
 
 def cf_product_based(all_products, user_product):

@@ -7,6 +7,7 @@ Output the result to result file
 
 import zipfile
 
+
 def output_result(pred_user_behaviors):
 
     """

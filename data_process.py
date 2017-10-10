@@ -10,12 +10,11 @@ import numpy as np
 
 class User(object):
 
-    def __init__(self, id, rank, gender, has_baby, baby_birth_date, baby_age=0, baby_gender=-99):
+    def __init__(self, id, rank, gender, has_baby, baby_age=0, baby_gender=-99):
         self.id = id
         self.rank = rank
         self.gender = gender
         self.has_baby = has_baby
-        self.baby_birth_date = baby_birth_date
         self.baby_age = baby_age
         self.baby_gender = baby_gender
 
@@ -53,7 +52,7 @@ def preprocess_user_info():
 
     def map_func(x):
         x = split_t(x)
-        return x[:3]+ x[5:]
+        return x[:3] + x[6:]
 
     user_elements = [map_func(x) for x in user_lines]
 
@@ -82,21 +81,18 @@ def process_user_info():
         user_rank = int(user_info[1])
         user_gender = int(user_info[2])
         has_baby = False
-        user_baby_birth = date_timestamp(user_info[3])
-        if user_baby_birth != -1:
-            has_baby = True
-            user_baby_age = int(user_info[4])
-            user_baby_gender = int(user_info[5])
-        else:
-            user_baby_age = 0
-            user_baby_gender = -99
 
+        user_baby_age = int(user_info[4])
+        user_baby_gender = int(user_info[5])
+
+        has_baby = True
+        if user_baby_gender == -99:
+            has_baby = False
         user = User(
             id=user_id,
             rank=user_rank,
             gender=user_gender,
             has_baby=has_baby,
-            baby_birth_date=user_baby_birth,
             baby_age=user_baby_age,
             baby_gender=user_baby_gender
         )
@@ -251,11 +247,79 @@ def process_product_info():
     return data
 
 
-# if __name__ == '__main__':
-#     process_product_info()
+def remove_unpurchased(under_action=1):
+
+    """
+    删除不活跃商品
+    :param under_action:
+    :return:
+    """
+
+    active_merchandise = {}
+
+    action_1_mer = process_user_behaviors('data/behaviors/action_1.txt')
+
+    for mer in action_1_mer:
+        active_merchandise[mer[1]] = 1
+
+    del action_1_mer
+
+    action_2_mer = process_user_behaviors('data/behaviors/action_2.txt')
+
+    for mer in action_2_mer:
+        active_merchandise[mer[1]] = 2
+
+    del action_2_mer
+
+    action_3_mer = process_user_behaviors('data/behaviors/action_3.txt')
+
+    for mer in action_3_mer:
+        active_merchandise[mer[1]] = 3
+
+    del action_3_mer
+
+    action_4_mer = process_user_behaviors('data/behaviors/action_4.txt')
+
+    for mer in action_4_mer:
+        active_merchandise[mer[1]] = 4
+
+    del action_4_mer
+
+    print("Active: %s" % len(active_merchandise))
+
+    all_merchandises = process_product_info()
+
+    print("All: %s" % len(all_merchandises))
+
+    clear_merchandise = []
+    for i in range(len(all_merchandises)):
+        element = all_merchandises[i]
+        if element[0] in active_merchandise:
+            clear_merchandise.append(clear_merchandise)
+
+    all_merchandises = clear_merchandise
+
+    print("All After Clear: %s" % (len(all_merchandises)))
+
+    data_path = 'data/products.txt'
+
+    f = open(data_path, 'w+')
+
+    for data_ele in all_merchandises:
+        line = ','.join(['%s' % x for x in data_ele[:5]])
+        line += ':'.join(['%s' % x for x in data_ele[5]])
+        line += '\n'
+
+        f.write(line)
+
+    f.close()
+
+    print("Clear Finished")
 
 
+if __name__ == '__main__':
 
+    preprocess_user_info()
 
 
 

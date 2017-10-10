@@ -164,7 +164,7 @@ def not_buying():
             purchased_dict[pur_[0]][pur_[1]] = 0
 
         purchased_dict[pur_[0]][pur_[1]] += 1
-
+    print("Load Purchased")
     del purchased_
 
     unpurchased_data = []
@@ -186,10 +186,8 @@ def not_buying():
     for dat in action_1_data:
         if dat[0] not in purchased_dict:
             unpurchased_data.append(dat)
-            continue
-        if dat[0] in unpurchased_data and dat[1] not in purchased_dict[dat[0]]:
+        elif dat[1] not in purchased_dict[dat[0]]:
             unpurchased_data.append(dat)
-            continue
     del action_1_data
 
     print("Finish Action 1: %s" % len(unpurchased_data))
@@ -199,10 +197,10 @@ def not_buying():
     for dat in action_2_data:
         if dat[0] not in purchased_dict:
             unpurchased_data.append(dat)
-            continue
-        if dat[1] not in purchased_dict[dat[0]]:
+
+        elif dat[1] not in purchased_dict[dat[0]]:
             unpurchased_data.append(dat)
-            continue
+
     del action_2_data
 
     print("Finish Action 2: %s" % len(unpurchased_data))
@@ -212,10 +210,8 @@ def not_buying():
     for dat in action_3_data:
         if dat[0] not in purchased_dict:
             unpurchased_data.append(dat)
-            continue
-        if dat[1] not in purchased_dict[dat[0]]:
+        elif dat[1] not in purchased_dict[dat[0]]:
             unpurchased_data.append(dat)
-            continue
     del action_3_data
 
     print("Finish Action 3: %s" % len(unpurchased_data))
@@ -227,9 +223,38 @@ def not_buying():
     write_to_file(unpurchased_data,'data/behaviors/notbuying.txt')
 
 
+def collect_user_product(action):
+
+    """
+    根据用户进行商品分类
+    :param action 1/2/3/4
+    :return:
+    """
+
+    action_data = process_user_behaviors('data/behaviors/action_%s.txt' % action)
+
+    user_product = {}
+
+    for element in action_data:
+        if element[0] not in user_product.keys():
+            user_product[element[0]] = []
+        user_product[element[0]].append(element)
+
+    return user_product
+
+
+def extract_features_from_merchandises(merchandise):
+    """
+    从商品中提取出人物特征
+    :param merchandise:
+    :return:
+    """
+
+    pass
+
 
 if __name__ == '__main__':
-    split_five_days_3_behavior()
+    not_buying()
 
 
 
