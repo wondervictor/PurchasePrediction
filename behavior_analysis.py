@@ -153,25 +153,78 @@ def not_buying():
     :return:
     """
 
-    purchased_data = process_user_behaviors('data/behaviors/action_4.txt')
-    shopcart_data = process_user_behaviors('data/behaviors/action_3.tx')
+    purchased_ = process_user_behaviors('data/behaviors/action_4.txt')
 
-    user_purchased = {}
-    user_shopcart = {}
+    purchased_dict = {}
 
-    for pur_ in purchased_data:
-        if pur_[0] not in user_purchased.keys():
-            user_purchased[pur_[0]] = set()
+    for pur_ in purchased_:
+        if pur_[0] not in purchased_dict.keys():
+            purchased_dict[pur_[0]] = dict()
+        if pur_[1] not in purchased_dict[pur_[0]].keys():
+            purchased_dict[pur_[0]][pur_[1]] = 0
 
-        user_purchased[pur_[0]].add(pur_[1])
+        purchased_dict[pur_[0]][pur_[1]] += 1
 
-    for cart_ in shopcart_data:
-        if cart_[0] not in user_shopcart.keys():
-            user_shopcart[cart_[0]] = set()
+    del purchased_
 
-            user_shopcart[cart_[0]].add(cart_[1])
-    for key in user_purchased.keys():
-        pass
+    unpurchased_data = []
+
+    def former_3_days_data(data):
+
+        start_time = '2017-7-26 00:00:00'
+        end_time = '2017-8-22 23:59:59'
+
+        start_time = date_to_timestamp(start_time)
+        end_time = date_to_timestamp(end_time)
+
+        data = filter_time(data, start_time, end_time)
+
+        return data
+
+    action_1_data = process_user_behaviors('data/behaviors/action_1.txt')
+
+    for dat in action_1_data:
+        if dat[0] not in purchased_dict:
+            unpurchased_data.append(dat)
+            continue
+        if dat[0] in unpurchased_data and dat[1] not in purchased_dict[dat[0]]:
+            unpurchased_data.append(dat)
+            continue
+    del action_1_data
+
+    print("Finish Action 1: %s" % len(unpurchased_data))
+
+    action_2_data = process_user_behaviors('data/behaviors/action_2.txt')
+
+    for dat in action_2_data:
+        if dat[0] not in purchased_dict:
+            unpurchased_data.append(dat)
+            continue
+        if dat[1] not in purchased_dict[dat[0]]:
+            unpurchased_data.append(dat)
+            continue
+    del action_2_data
+
+    print("Finish Action 2: %s" % len(unpurchased_data))
+
+    action_3_data = process_user_behaviors('data/behaviors/action_3.txt')
+
+    for dat in action_3_data:
+        if dat[0] not in purchased_dict:
+            unpurchased_data.append(dat)
+            continue
+        if dat[1] not in purchased_dict[dat[0]]:
+            unpurchased_data.append(dat)
+            continue
+    del action_3_data
+
+    print("Finish Action 3: %s" % len(unpurchased_data))
+
+    unpurchased_data = former_3_days_data(unpurchased_data)
+
+    print("Not Buying: %s" % len(unpurchased_data))
+
+    write_to_file(unpurchased_data,'data/behaviors/notbuying.txt')
 
 
 
