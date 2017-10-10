@@ -300,7 +300,7 @@ def generate_dataset(testing_size):
     test_data_pos = buying_data[testing_size/2:]
     test_data_neg = notbuying_data[testing_size/2:]
 
-    train_data = test_data_neg + train_data_pos
+    train_data = train_data_neg + train_data_pos
     test_data = test_data_neg + test_data_pos
 
     random.shuffle(train_data)
@@ -309,44 +309,9 @@ def generate_dataset(testing_size):
     return train_data, test_data
 
 
-
 if __name__ == '__main__':
     action_4 = process_user_behaviors('data/behaviors/action_4.txt')
     print(len(action_4))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
