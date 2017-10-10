@@ -243,14 +243,6 @@ def collect_user_product(action):
     return user_product
 
 
-def extract_features_from_merchandises(merchandise):
-    """
-    从商品中提取出人物特征
-    :param merchandise:
-    :return:
-    """
-
-    pass
 
 
 if __name__ == '__main__':
