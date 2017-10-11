@@ -119,7 +119,7 @@ def process_words():
     print("Saved to files")
 
 
-def gen_product_embedding_info(dict_dim, output_dim):
+def gen_all_product_embedding_info(dict_dim, output_dim):
 
     embedding = torch_nn.Embedding(dict_dim, output_dim)
 
@@ -149,10 +149,32 @@ def gen_product_embedding_info(dict_dim, output_dim):
         output_vector = gen_embedding_vector(description, nums_)
 
         output_vector = output_vector.data.numpy()
-
         description_dict[product_id] = output_vector
 
     return description_dict
+
+
+def gen_product_embedding(input, dict_dim=53900, output_dim=1000):
+    """
+    生成词向量
+    :param input:输入为描述序列
+    :param dict_dim:
+    :param output_dim:
+    :return:
+    """
+
+    embedding = torch_nn.Embedding(dict_dim, output_dim)
+    nums = len(input)
+    input = Variable(torch.LongTensor(input))
+    result_vector = Variable(torch.zeros((1, output_dim)))
+    if nums == 0:
+        return result_vector
+
+    output = embedding(input)
+    for i in range(nums):
+        result_vector += output[i]
+
+    return result_vector
 
 
 # 构建特征
@@ -169,3 +191,9 @@ def construct_product_features():
 
 
 if __name__ == '__main__':
+
+    embedding_dict = gen_all_product_embedding_info(53900, 1000)
+
+    print(len(embedding_dict))
+
+

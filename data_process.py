@@ -81,8 +81,8 @@ def process_user_info():
         user_rank = int(user_info[1])
         user_gender = int(user_info[2])
 
-        user_baby_age = int(user_info[4])
-        user_baby_gender = int(user_info[5])
+        user_baby_age = int(user_info[3])
+        user_baby_gender = int(user_info[4])
 
         has_baby = True
         if user_baby_gender == -99:
