@@ -187,24 +187,37 @@ def process_raw_products_info():
         product.append(title)
         product.append(int(line[-1]))
 
+        """
         for t in title:
             if remove_digits(t):
                 if t not in word_bag:
                     word_bag[t] = 0
                 word_bag[t] += 1
-
+        """
         products.append(product)
     print(len(products))
-    dictionary = build_dict(word_bag, 'data/word.dict')
+    #dictionary = build_dict(word_bag, 'data/word.dict')
 
     output_file = open('data/products.txt', 'w+')
 
     def filter_func(m):
         s = []
+        specials = ['~', '@', ',', '【', '】', '#', '$', '%', '&', '', ' ', '!', '+', '-', '/', '*',
+                    ':', ';', '?', '{', '}', '¥', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                    '(', ')', '<', '>', '=', '|', 'a', '《', '》', '。', '的', '地', '得']
+        for _element in m:
+            # 除去特殊字符
+            if _element not in specials:
+                # 除去数字
+                if remove_digits(_element):
+                    s.append(_element)
+
+        """
         for _element in m:
             _element = dictionary.get(_element, UNK_ID)
             if _element != 0:
                 s.append(_element)
+        """
         return s
 
     for product in products:
@@ -240,7 +253,7 @@ def process_product_info():
         for line in lines:
             elements = line.rstrip('\n').split(',')
             if len(elements[-1]):
-                describe_words = map(int, elements[-1].split(':'))
+                describe_words = elements[-1].split(':')
             else:
                 describe_words = []
             elements = map(int, elements[:-1])
@@ -321,11 +334,11 @@ def remove_unactive(under_action=1):
     print("Clear Finished")
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
 #
 #     preprocess_user_info()
-#     process_raw_products_info()
-#     remove_unactive(1)
+    process_raw_products_info()
+    remove_unactive(1)
 
 
 

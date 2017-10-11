@@ -3,7 +3,7 @@
 import scipy as sp
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
 import numpy as np
-
+from data_process import process_product_info
 
 def get_same_class_product(class_id, product_data):
     """
@@ -62,6 +62,14 @@ def gen_tfidf_vector(sentences):
     tf_vector = transformer.fit_transform(word_freq)
     np.save('words', word)
     np.save('tf_idf_vector', tf_vector)
+
+
+def process_words():
+
+    product_info = process_product_info()
+    
+
+
 
 
 # 构建特征
