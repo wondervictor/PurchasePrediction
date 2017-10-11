@@ -60,7 +60,7 @@ def get_products_feature():
         product_dict[temp_id] = data[1:]
 
     print("build products feature.")
-    return product_dict
+    return product_dict 
         
         
 
