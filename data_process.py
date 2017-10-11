@@ -168,6 +168,46 @@ def build_dict(word_set, dict_file, size=60000):
 def process_raw_products_info():
     """
     处理原始Product信息，将其信息提取成为以下格式
+    商品ID,商家ID,品牌ID,类型ID,价格,描述xx xx xxx xxx
+    xxx已使用词典进行数字化
+    """
+
+    data_path = 'data/product_info.txt'
+
+    with open(data_path, 'r') as f:
+        product_lines = f.readlines()
+
+    products = []
+
+    for line in product_lines:
+        line = split_t(line)
+        product = map(int, line[:4])
+        product.append(int(line[-1]))
+        product.append(line[4])
+        products.append(product)
+
+    print(len(products))
+
+    output_file = open('data/products.txt', 'w+')
+
+    for product in products:
+
+        line = '\t'.join(['%s' % x for x in product[:5]])
+        line += '\t'
+        if products[5][0] == ' ':
+            line += '%s' % product[5][1:]
+        else:
+            line += '%s' % product[5]
+
+        line += '\n'
+        output_file.write(line)
+    print("Saved")
+    output_file.close()
+
+
+def process_raw_products_info1():
+    """
+    处理原始Product信息，将其信息提取成为以下格式
     商品ID,商家ID,品牌ID,类型ID,价格,描述xx:xx:xxx:xxx
     xxx已使用词典进行数字化
     """
@@ -224,12 +264,12 @@ def process_raw_products_info():
 
         title = product[4]
 
-        title = filter_func(title)
+        #title = filter_func(title)
         product[4] = title
         line = ','.join(['%s' % x for x in product[:4]])
         line += ','
         line += '%s,' % product[5]
-        line += ':'.join(['%s' % x for x in title])
+        line += title #':'.join(['%s' % x for x in title])
         line += '\n'
 
         output_file.write(line)
@@ -251,13 +291,10 @@ def process_product_info():
     with open(data_path, 'r') as f:
         lines = f.readlines()
         for line in lines:
-            elements = line.rstrip('\n').split(',')
-            if len(elements[-1]):
-                describe_words = elements[-1].split(':')
-            else:
-                describe_words = []
+            elements = line.rstrip('\n').split('\t')
+            des = elements[-1]
             elements = map(int, elements[:-1])
-            elements.append(describe_words)
+            elements.append(des)
             data.append(elements)
 
     return data
@@ -317,19 +354,19 @@ def remove_unactive(under_action=1):
 
     print("All After Clear: %s" % (len(all_merchandises)))
 
-    data_path = 'data/products.txt'
+    output_file = open('data/products.txt', 'w+')
 
-    f = open(data_path, 'w+')
+    for product in all_merchandises:
 
-    for data_ele in all_merchandises:
-        line = ','.join(['%s' % x for x in data_ele[:5]])
-        line += ','
-        line += ':'.join(['%s' % x for x in data_ele[5]])
+        line = '\t'.join(['%s' % x for x in product[:5]])
+        line += '\t'
+
+        line += '%s' % product[5]
+
         line += '\n'
-
-        f.write(line)
-
-    f.close()
+        output_file.write(line)
+    print("Saved")
+    output_file.close()
 
     print("Clear Finished")
 

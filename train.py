@@ -24,9 +24,3 @@ if __name__ == "__main__":
         #输入到模型里的商品
         prod_by_user = get_products_by_user(user.id, priducts_dict)
 
-
-
-        
-        
-        
-    
