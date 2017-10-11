@@ -142,13 +142,13 @@ def split_five_days_3_behavior():
 
     behaviors = process_user_behaviors()
     seven_days = filter_time(behaviors, start_time, end_time)
-    shopping_cart = filter_user_action(3, seven_days)
-    purchased = filter_user_action(4, seven_days)
-    print("start to remove")
-    print(len(purchased), len(shopping_cart))
-    _shopping = remove_purchased(purchased, shopping_cart)
+    #shopping_cart = filter_user_action(3, seven_days)
+    # purchased = filter_user_action(4, seven_days)
+    # print("start to remove")
+    # print(len(purchased), len(shopping_cart))
+    # _shopping = remove_purchased(purchased, shopping_cart)
 
-    result = [(x[0], x[1]) for x in _shopping]
+    result = [(x[0], x[1]) for x in seven_days]
     output.output_result(result)
 
 
@@ -308,7 +308,9 @@ def generate_dataset(testing_size):
     return train_data, test_data
 
 
+if __name__ == '__main__':
 
+    split_five_days_3_behavior()
 
 
 
