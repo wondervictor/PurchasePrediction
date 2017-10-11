@@ -142,13 +142,13 @@ def split_five_days_3_behavior():
 
     behaviors = process_user_behaviors()
     seven_days = filter_time(behaviors, start_time, end_time)
-    #shopping_cart = filter_user_action(3, seven_days)
-    # purchased = filter_user_action(4, seven_days)
+    shopping_cart = filter_user_action(3, seven_days)
+    #purchased = filter_user_action(4, seven_days)
     # print("start to remove")
     # print(len(purchased), len(shopping_cart))
     # _shopping = remove_purchased(purchased, shopping_cart)
 
-    result = [(x[0], x[1]) for x in seven_days]
+    result = [(x[0], x[1]) for x in shopping_cart]
     output.output_result(result)
 
 

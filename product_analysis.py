@@ -33,7 +33,6 @@ def get_same_class_product(class_id, product_data):
     return class_data
 
 
-# TD-IDF分词处理
 def dist_norm(v1, v2):
     """
     距离度量
@@ -48,16 +47,13 @@ def dist_norm(v1, v2):
     return sp.linalg.norm(delta)
 
 
-def get_similarity(product_a, product_b, tfidf_vector):
+def get_similarity(product_a, product_b):
     """
-    利用TD-IDF和距离度量相似度
+    利用距离度量相似度
     :return:
     """
 
-    desciption_a = tfidf_vector[product_a]
-    desciption_b = tfidf_vector[product_b]
-
-    return dist_norm(desciption_a, desciption_b)
+    return dist_norm(product_a, product_b)
 
 
 def train_tfidf_model(sentences, tfidf_model):

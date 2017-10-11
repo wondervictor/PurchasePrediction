@@ -1,7 +1,32 @@
 # -*- coding: utf-8 -*-
 
+import numpy as np
 from scipy.spatial.distance import cosine
+from data_process import process_user_info
 from behavior_analysis import process_user_behaviors, filter_time, write_to_file, date_to_timestamp
+from product_analysis import get_similarity
+
+
+def similarity_embedding(embed_a, embed_b):
+    """
+    获得相似度 / embedding 特征
+    :param embed_a:
+    :param embed_b:
+    :return:
+    """
+    return get_similarity(embed_a, embed_b)
+
+
+def similarity_self(self_a, self_b):
+    """
+    固有特征
+    :param self_a:
+    :param self_b:
+    :return:
+    """
+    self_a = np.array(self_a)
+    self_b = np.array(self_b)
+    return get_similarity(self_a, self_b)
 
 
 def cf_product_based(all_products, user_product):
@@ -22,6 +47,16 @@ def cf_person_based(rank):
     :rank: 选取rank名相似用户进行推荐
     :return:
     """
+    def sim(person_a, person_b):
+
+        pass
+
+    users = process_user_info()
+    
+
+
+
+
 
     pass
 

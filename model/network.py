@@ -13,8 +13,8 @@ import torch.nn.functional as F
 import torch.optim as optimizer
 from torch.autograd import Variable
 
-USER_VECTOR_SIZE=10
-PRODUCT_VECTOR_SIZE=10
+USER_VECTOR_SIZE = 10
+PRODUCT_VECTOR_SIZE = 10
 
 
 class NeuralNetwork(nn.Module):
