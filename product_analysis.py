@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import scipy as sp
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
 import numpy as np
 
 
@@ -52,11 +52,16 @@ def gen_tfidf_vector(sentences):
     :return:
     """
 
+    counter = CountVectorizer()
 
+    word_freq = counter.fit_transform(sentences)
+    # 获取词汇
+    word = word_freq.get_feature_names()
 
-
-
-
+    transformer = TfidfTransformer()
+    tf_vector = transformer.fit_transform(word_freq)
+    np.save('words', word)
+    np.save('tf_idf_vector', tf_vector)
 
 
 # 构建特征
