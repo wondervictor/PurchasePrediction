@@ -7,7 +7,7 @@ User Model
 from data_process import User, process_product_info
 
 
-def extract_features_from_product(products):
+def extract_features_from_product(products, feature_dict):
     """
     从商品中提取出人物特征：
 
@@ -17,16 +17,15 @@ def extract_features_from_product(products):
     :param products:
     :return:
     """
-    product_1 = products[0][0]#浏览的商品
-    product_2 = products[1][0]#收藏
-    product_3 = products[2][0]#加购
-    product_4 = products[3][0]#购买
+    temp_vector = []
+    for product in products:
+        temp_vector.append(feature_dict[product[0]])
 
     feature = []
     return feature
 
 
-def build_user_features(user, products_dict):
+def build_user_features(user, products_dict, products_feature):
 
     """
     用户特征: 商品特征+固有特征 [商品成分分析] + [购物等级、贫富、孩子年龄，孩子性别]
@@ -36,9 +35,9 @@ def build_user_features(user, products_dict):
     #用户自己的信息构建的特征
     user_feature = [user.id, user.rank, user.hasbaby, user.baby_age, user.baby_gender]
     #根据用户买的商品的信息作为特征
-    feature_from_product = extract_features_from_product(products)
-    feature = user_feature + feature_from_product
-    return feature
+    # feature_from_product = extract_features_from_product(products, products_feature)
+    # feature = user_feature + feature_from_product
+    return user_feature
 
 
 
