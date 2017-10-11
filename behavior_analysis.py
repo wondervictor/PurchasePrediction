@@ -237,7 +237,7 @@ def collect_user_product(action):
     :param action 1/2/3/4
     :return:
     """
-
+    print("start read action")
     action_data = process_user_behaviors('data/behaviors/action_%s.txt' % action)
 
     user_product = {}
