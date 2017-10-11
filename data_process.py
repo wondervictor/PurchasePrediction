@@ -335,8 +335,7 @@ def remove_unactive(under_action=1):
 
 
 if __name__ == '__main__':
-#
-#     preprocess_user_info()
+
     process_raw_products_info()
     remove_unactive(1)
 

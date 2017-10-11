@@ -52,6 +52,10 @@ def gen_tfidf_vector(sentences):
     :return:
     """
 
+    stops = ['~', '@', ',', '【', '】', '#', '$', '%', '&', ' ', '!', '+', '-', '/', '*',
+                ':', ';', '?', '{', '}', '¥', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                '(', ')', '<', '>', '=', '|', 'a', '《', '》', '。', u'的', u'地', u'得']
+
     counter = CountVectorizer()
 
     word_freq = counter.fit_transform(sentences)
@@ -67,7 +71,9 @@ def gen_tfidf_vector(sentences):
 def process_words():
 
     product_info = process_product_info()
-    
+
+
+
 
 
 
