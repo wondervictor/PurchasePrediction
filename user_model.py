@@ -5,6 +5,7 @@ User Model
 """
 
 from data_process import User, process_product_info
+from product_analysis import gen_product_embedding
 
 
 def extract_features_from_product(products, feature_dict):
@@ -17,9 +18,18 @@ def extract_features_from_product(products, feature_dict):
     :param products:
     :return:
     """
-    temp_vector = []
+    all_discribes = []
     for product in products:
-        temp_vector.append(feature_dict[product[0]])
+        product_id = product[0]
+        product_data = feature_dict[product_id]
+        discribes = product_data[5]
+        all_discribes += discribes
+    discribe_vector = gen_product_embedding(all_discribes)
+
+    
+    # temp_vector = []
+    # for product in products:
+    #     temp_vector.append(feature_dict[product[0]])
 
     feature = []
     return feature
@@ -33,10 +43,14 @@ def build_user_features(user, products_dict, products_feature):
     """
     products = products_dict[user.id]
     #用户自己的信息构建的特征
+    
     user_feature = [user.id, user.rank, user.hasbaby, user.baby_age, user.baby_gender]
+    
+
+
     #根据用户买的商品的信息作为特征
-    # feature_from_product = extract_features_from_product(products, products_feature)
-    # feature = user_feature + feature_from_product
+    feature_from_product = extract_features_from_product(products, products_feature)
+    feature = user_feature + feature_from_product
     print("build users feature")
     return user_feature
 
