@@ -154,7 +154,7 @@ def gen_all_product_embedding_info(dict_dim, output_dim):
     return description_dict
 
 
-def gen_product_embedding(input, dict_dim=53900, output_dim=1000):
+def gen_product_embedding(input, dict_dim=53900, output_dim=512):
     """
     生成词向量
     :param input:输入为描述序列
