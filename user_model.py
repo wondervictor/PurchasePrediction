@@ -4,7 +4,7 @@
 User Model
 """
 
-from data_process import User
+from data_process import User, process_product_info
 
 
 def extract_features_from_product(products):
