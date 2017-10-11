@@ -37,6 +37,7 @@ def build_user_features(user, products_dict, products_feature):
     #根据用户买的商品的信息作为特征
     # feature_from_product = extract_features_from_product(products, products_feature)
     # feature = user_feature + feature_from_product
+    print("build users feature")
     return user_feature
 
 

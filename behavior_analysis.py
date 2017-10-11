@@ -246,6 +246,7 @@ def collect_user_product(action):
             user_product[element[0]] = []
         user_product[element[0]].append(element[1:])
 
+    print("read action_%s.txt" % action)
     return user_product
 
 
@@ -289,6 +290,11 @@ def generate_dataset(testing_size):
 
     # shuffle
     random.shuffle(buying_data)
+    random.shuffle(notbuying_data)
+
+    train_data_pos = buying_data[:-testing_size/2]
+    train_data_neg = notbuying_data[:-testing_size/2]
+(buying_data)
     random.shuffle(notbuying_data)
 
     train_data_pos = buying_data[:-testing_size/2]

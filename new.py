@@ -24,6 +24,7 @@ def get_product_user_relation(user, behavior):
     products_3 = behavior[2][user.id]
     products_4 = behavior[3][user.id]
     products = products_1+products_2+products_3+products_4
+    print("build products list.")
     return products
 
 
@@ -36,6 +37,7 @@ def build_product_dict(all_users, behavior):
         id = user.id
         products = get_product_user_relation(user, behavior)
         products_by_user[id]=products
+
     return products_by_user
         
 def bulid_all_users_feature(all_users, products_dict, products_feature):
@@ -55,8 +57,9 @@ def get_products_feature():
     product_dict = {}
     for data in datas:
         temp_id = data[0]
-        if temp_id not in product_dict.keys():
-            product_dict[temp_id] = data[1:]
+        product_dict[temp_id] = data[1:]
+
+    print("build products feature.")
     return product_dict
         
         
