@@ -4,6 +4,7 @@ from data_process import process_user_info
 from behavior_analysis import collect_user_product
 from user_model import build_user_features
 
+
 def get_all_behavior():
     behavior_1 = collect_user_product(1)
     behavior_2 = collect_user_product(2)
@@ -11,6 +12,7 @@ def get_all_behavior():
     behavior_4 = collect_user_product(4)
     behavior = [behavior_1, behavior_2, behavior_3, behavior_4]
     return behavior
+
 
 def get_products_by_user(id, products_dict):
     """
@@ -62,7 +64,8 @@ def build_product_dict(all_users, behavior):
         products = get_product_user_relation(user, behavior)
         products_by_user[id]=products
     return products_by_user
-        
+
+
 def bulid_all_users_feature(all_users, products_dict):
     """
     构建一个用户字典，key为用户id，value为特征

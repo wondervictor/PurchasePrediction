@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import pickle
 import scipy as sp
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
 import numpy as np
 from data_process import process_product_info
+
 
 
 def get_same_class_product(class_id, product_data):
@@ -39,12 +41,16 @@ def dist_norm(v1, v2):
     return sp.linalg.norm(delta)
 
 
-def get_similarity():
+def get_similarity(product_a, product_b, tfidf_vector):
     """
     利用TD-IDF和距离度量相似度
     :return:
     """
-    pass
+
+    desciption_a = tfidf_vector[product_a]
+    desciption_b = tfidf_vector[product_b]
+
+    return dist_norm(desciption_a, desciption_b)
 
 
 def train_tfidf_model(sentences, tfidf_model):
@@ -87,16 +93,12 @@ def process_words():
 
     for ele in product_info:
         pro_id = ele[0]
-        tfidf_values[pro_id] = gen_tfidf_vector([ele[5][1:]], transformer)
+        tfidf_values[pro_id] = gen_tfidf_vector([ele[5][1:]], transformer)[0]
 
-    print(len(tfidf_values))
-
-
-
-
-
-
-
+    f = open('model_param/tfidf_value.pkl', 'wb')
+    pickle.dump(tfidf_values, f)
+    f.close()
+    print("Saved to files")
 
 
 # 构建特征
@@ -110,6 +112,7 @@ def construct_product_features():
     :return:
     """
     pass
+
 
 if __name__ == '__main__':
     process_words()

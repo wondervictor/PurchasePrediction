@@ -3,7 +3,7 @@
 
 ### TODO
 
-- [ ] 构造分类器 (Random Forest/XGBoost)
+- [x] 构造分类器 (Random Forest/XGBoost)
 
 - [ ] 可视化 (数量versus价格、商品数versus销量)
 
@@ -22,3 +22,5 @@
 - [ ] 物品特征提取
 
 - [x] 提取商品负例
+
+- [x] 分词提取
