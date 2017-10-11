@@ -294,7 +294,7 @@ def generate_dataset(testing_size):
 
     train_data_pos = buying_data[:-testing_size/2]
     train_data_neg = notbuying_data[:-testing_size/2]
-(buying_data)
+    random.shuffle(buying_data)
     random.shuffle(notbuying_data)
 
     train_data_pos = buying_data[:-testing_size/2]
