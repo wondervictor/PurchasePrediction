@@ -244,7 +244,7 @@ def collect_user_product(action):
     for element in action_data:
         if element[0] not in user_product.keys():
             user_product[element[0]] = []
-        user_product[element[0]].append(element)
+        user_product[element[0]].append(element[1:])
 
     return user_product
 
