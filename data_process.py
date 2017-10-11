@@ -279,10 +279,13 @@ def process_product_info():
     with open(data_path, 'r') as f:
         lines = f.readlines()
         for line in lines:
-            elements = line.rstrip('\n').split('\t')
-            des = elements[-1]
+            elements = line.rstrip('\n').split(',')
+            if len(elements[-1]):
+                describe_words = map(int, elements[-1].split(':'))
+            else:
+                describe_words = []
             elements = map(int, elements[:-1])
-            elements.append(des)
+            elements.append(describe_words)
             data.append(elements)
 
     return data
@@ -342,28 +345,26 @@ def remove_unactive(under_action=1):
 
     print("All After Clear: %s" % (len(all_merchandises)))
 
-    output_file = open('data/products.txt', 'w+')
+    data_path = 'data/products.txt'
 
-    for product in all_merchandises:
+    f = open(data_path, 'w+')
 
-        line = '\t'.join(['%s' % x for x in product[:5]])
-        line += '\t'
-
-        line += '%s' % product[5]
-
+    for data_ele in all_merchandises:
+        line = ','.join(['%s' % x for x in data_ele[:5]])
+        line += ','
+        line += ':'.join(['%s' % x for x in data_ele[5]])
         line += '\n'
-        output_file.write(line)
-    print("Saved")
-    output_file.close()
+
+        f.write(line)
+
+    f.close()
 
     print("Clear Finished")
 
 
 if __name__ == '__main__':
 
-    process_raw_products_info()
-    remove_unactive(1)
-
+    remove_unactive()
 
 
 

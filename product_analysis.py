@@ -4,7 +4,15 @@ import pickle
 import scipy as sp
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
 import numpy as np
+import torch
+import torch.nn as torch_nn
+from torch.autograd import Variable
 from data_process import process_product_info
+
+"""
+采用Embedding模型进行特征提取
+IF-IDF模型废除
+"""
 
 
 def get_same_class_product(class_id, product_data):
@@ -53,7 +61,13 @@ def get_similarity(product_a, product_b, tfidf_vector):
 
 
 def train_tfidf_model(sentences, tfidf_model):
+    """
+    训练TF-IDF模型
 
+    :param sentences:
+    :param tfidf_model:
+    :return:
+    """
     tf_vector = tfidf_model.fit_transform(sentences)
     print(tf_vector.toarray().shape)
 
@@ -70,7 +84,10 @@ def gen_tfidf_vector(sentences, tfidf_model):
 
 
 def process_words():
-
+    """
+    利用 TF-IDF计算相似度
+    :return:
+    """
     product_info = process_product_info()
 
     sentences = [x[5][1:] for x in product_info]
@@ -102,6 +119,42 @@ def process_words():
     print("Saved to files")
 
 
+def gen_product_embedding_info(dict_dim, output_dim):
+
+    embedding = torch_nn.Embedding(dict_dim, output_dim)
+
+    # 线性求和
+    def gen_embedding_vector(input, nums):
+        result_vector = Variable(torch.zeros((1, output_dim)))
+        if nums == 0:
+            return result_vector
+
+        output = embedding(input)
+        for i in range(nums):
+            result_vector += output[i]
+
+        return result_vector
+
+    products = process_product_info()
+
+    description_dict = {}
+
+    for product in products:
+
+        product_id = product[0]
+        description = product[5]
+        nums_ = len(description)
+        description = Variable(torch.LongTensor(description))
+
+        output_vector = gen_embedding_vector(description, nums_)
+
+        output_vector = output_vector.data.numpy()
+
+        description_dict[product_id] = output_vector
+
+    return description_dict
+
+
 # 构建特征
 def construct_product_features():
     """
@@ -116,4 +169,3 @@ def construct_product_features():
 
 
 if __name__ == '__main__':
-    process_words()
