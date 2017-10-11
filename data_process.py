@@ -96,6 +96,7 @@ def process_user_info():
             baby_gender=user_baby_gender
         )
         users.append(user)
+    print("read user information.")
     return users
 
 
