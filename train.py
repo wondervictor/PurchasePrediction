@@ -23,7 +23,3 @@ if __name__ == "__main__":
     user_feature_dict = bulid_all_users_feature(all_users, priducts_dict, products_feature)
     
 
-        
-        
-        
-    
