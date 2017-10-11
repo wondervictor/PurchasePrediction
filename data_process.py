@@ -165,7 +165,7 @@ def build_dict(word_set, dict_file, size=60000):
     return word_dict
 
 
-def process_raw_products_info():
+def process_raw_products_info1():
     """
     处理原始Product信息，将其信息提取成为以下格式
     商品ID,商家ID,品牌ID,类型ID,价格,描述xx xx xxx xxx
@@ -205,7 +205,7 @@ def process_raw_products_info():
     output_file.close()
 
 
-def process_raw_products_info1():
+def process_raw_products_info():
     """
     处理原始Product信息，将其信息提取成为以下格式
     商品ID,商家ID,品牌ID,类型ID,价格,描述xx:xx:xxx:xxx
@@ -227,49 +227,37 @@ def process_raw_products_info1():
         product.append(title)
         product.append(int(line[-1]))
 
-        """
         for t in title:
             if remove_digits(t):
                 if t not in word_bag:
                     word_bag[t] = 0
                 word_bag[t] += 1
-        """
         products.append(product)
     print(len(products))
-    #dictionary = build_dict(word_bag, 'data/word.dict')
+    dictionary = build_dict(word_bag, 'data/word.dict')
 
     output_file = open('data/products.txt', 'w+')
 
     def filter_func(m):
         s = []
-        specials = ['~', '@', ',', '【', '】', '#', '$', '%', '&', '', ' ', '!', '+', '-', '/', '*',
-                    ':', ';', '?', '{', '}', '¥', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                    '(', ')', '<', '>', '=', '|', 'a', '《', '》', '。', '的', '地', '得']
-        for _element in m:
-            # 除去特殊字符
-            if _element not in specials:
-                # 除去数字
-                if remove_digits(_element):
-                    s.append(_element)
 
-        """
         for _element in m:
             _element = dictionary.get(_element, UNK_ID)
             if _element != 0:
                 s.append(_element)
-        """
+
         return s
 
     for product in products:
 
         title = product[4]
 
-        #title = filter_func(title)
+        title = filter_func(title)
         product[4] = title
         line = ','.join(['%s' % x for x in product[:4]])
         line += ','
         line += '%s,' % product[5]
-        line += title #':'.join(['%s' % x for x in title])
+        line += ':'.join(['%s' % x for x in title])
         line += '\n'
 
         output_file.write(line)

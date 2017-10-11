@@ -7,7 +7,6 @@ import numpy as np
 from data_process import process_product_info
 
 
-
 def get_same_class_product(class_id, product_data):
     """
     获得同类商品
@@ -80,9 +79,11 @@ def process_words():
                 ':', ';', '?', '{', '}', '¥', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                 '(', ')', '<', '>', '=', '|', 'a', '《', '》', '。', '的', '地', '得']
 
-    transformer = TfidfVectorizer(min_df=1, stop_words=stops)
+    transformer = TfidfVectorizer(min_df=2, stop_words=stops)
 
     nums_examples = len(product_info)
+
+    print(nums_examples)
 
     batch_size = 60000
 
