@@ -23,10 +23,10 @@ class NeuralNetwork(nn.Module):
 
         super(NeuralNetwork, self).__init__()
 
-        self.user_merchandise_layer = nn.Linear(512, 512)
+        self.user_merchandise_layer = nn.Linear(256, 512)
         self.user_self_layer = nn.Linear(USER_VECTOR_SIZE, 128)
 
-        self.merchandise_description_layer = nn.Linear(512, 512)
+        self.merchandise_description_layer = nn.Linear(256, 512)
         self.merchandise_self_layer = nn.Linear(PRODUCT_VECTOR_SIZE, 128)
 
         self.user_layer = nn.Linear(640, 512)
@@ -45,17 +45,17 @@ class NeuralNetwork(nn.Module):
         merchandise_self = F.relu(self.merchandise_self_layer(product_vector))
 
         user_layer = F.leaky_relu(
-            self.user_layer(torch.cat([user_desc, user_self])),
+            self.user_layer(torch.cat([user_desc, user_self], dim=1)),
             negative_slope=0.2
         )
 
         merchandise_layer = F.leaky_relu(
-            self.merchandise_layer(torch.cat([merchandise_desc, merchandise_self])),
+            self.merchandise_layer(torch.cat([merchandise_desc, merchandise_self], dim=1)),
             negative_slope=0.2
         )
 
         hidden = F.leaky_relu(
-            self.hidden_layer_1(torch.cat([user_layer, merchandise_layer])),
+            self.hidden_layer_1(torch.cat([user_layer, merchandise_layer], dim=1)),
             negative_slope=0.5
         )
 
@@ -85,10 +85,11 @@ def load_model(path):
 
 
 def output(network, user_self_vector, user_desc_vector, product_self_vector, product_desc_vector):
-    user_self_vector = Variable(torch.FloatTensor(user_self_vector))
-    user_desc_vector = Variable(torch.FloatTensor(user_desc_vector))
-    product_desc_vector = Variable(torch.FloatTensor(product_desc_vector))
-    product_self_vector = Variable(torch.FloatTensor(product_self_vector))
+
+    user_self_vector = Variable(torch.FloatTensor(user_self_vector)).unsqueeze(0)
+    user_desc_vector = Variable(torch.FloatTensor(user_desc_vector)).unsqueeze(0)
+    product_desc_vector = Variable(torch.FloatTensor(product_desc_vector)).unsqueeze(0)
+    product_self_vector = Variable(torch.FloatTensor(product_self_vector)).unsqueeze(0)
 
     prob = network(
         product_vector=product_self_vector,
@@ -100,7 +101,7 @@ def output(network, user_self_vector, user_desc_vector, product_self_vector, pro
     return prob
 
 
-def train(trainset, epoch, user_feature, product_feature, embedding):
+def train(trainset, batch_size, epoch, user_feature, product_feature):
 
     learning_rate = 0.0001
 
@@ -112,42 +113,80 @@ def train(trainset, epoch, user_feature, product_feature, embedding):
 
     for i in range(epoch):
         j = 0
-        for data in trainset:
-            person_id = data[0]
-            product_id = data[1]
-            label = data[-1]
-            if person_id not in user_feature or len(user_feature[person_id]) == 0:
-                print("--%s--" % j)
-                continue
-            user_self_vector = user_feature[person_id][:9]
-            m = 1 if user_self_vector[2] else 0
-            user_self_vector[2] = m
-            user_desc_vector = user_feature[person_id][9]
-            user_desc_vector = embedding(user_desc_vector)
+        while j < len(trainset)-batch_size:
 
-            product_self_vector = product_feature[product_id][:6]
-            product_desc_vector = product_feature[product_id][6]
-            product_desc_vector = embedding(product_desc_vector)
+            user_self_vector = []
+            user_desc_vector = []
+            product_self_vector = []
+            product_desc_vector = []
+            labels = []
 
-            label = Variable(torch.LongTensor([label]))
+            for p in range(batch_size):
+                person_id = trainset[p+j][0]
+                product_id = trainset[p+j][1]
+                user_self_vector.append(user_feature[person_id][:9])
+                user_desc_vector.append(user_feature[person_id][9])
+                product_self_vector.append(product_feature[product_id][:6])
+                product_desc_vector.append(product_feature[product_id][6])
+                labels.append(trainset[p+j][-1])
 
-            prob = output(
-                network,
-                user_self_vector,
-                user_desc_vector,
-                product_self_vector,
-                product_desc_vector
+            j += batch_size
+
+            user_self_vector = Variable(torch.FloatTensor(user_self_vector))
+            user_desc_vector = Variable(torch.FloatTensor(user_desc_vector))
+            product_desc_vector = Variable(torch.FloatTensor(product_desc_vector))
+            product_self_vector = Variable(torch.FloatTensor(product_self_vector))
+
+            prob = network(
+                product_vector=product_self_vector,
+                user_vector=user_self_vector,
+                user_desc_vector=user_desc_vector,
+                product_desc_vector=product_desc_vector
             )
-            prob = prob.unsqueeze(0)
-            loss = loss_criterion(prob, label)
-            j += 1
 
-            if j % 5:
+            labels = Variable(torch.LongTensor(labels))
+            loss = loss_criterion(prob, labels)
+            if j % 10:
                 print("Sample: %s: Loss: %s" % (j+1, loss.data[0]))
 
             training_optimizer.zero_grad()
             loss.backward()
             training_optimizer.step()
+
+        # for data in trainset:
+        #     person_id = data[0]
+        #     product_id = data[1]
+        #     label = data[-1]
+        #     if person_id not in user_feature or len(user_feature[person_id]) == 0:
+        #         print("--%s--" % j)
+        #         continue
+        #     user_self_vector = user_feature[person_id][:9]
+        #     m = 1 if user_self_vector[2] else 0
+        #     user_self_vector[2] = m
+        #     user_desc_vector = user_feature[person_id][9]
+        #
+        #     product_self_vector = product_feature[product_id][:6]
+        #     product_desc_vector = product_feature[product_id][6]
+        #
+        #     label = Variable(torch.LongTensor([label]))
+        #
+        #     prob = output(
+        #         network,
+        #         user_self_vector,
+        #         user_desc_vector,
+        #         product_self_vector,
+        #         product_desc_vector
+        #     )
+        #     prob = prob.unsqueeze(0)
+        #     loss = loss_criterion(prob, label)
+        #     j += 1
+        #
+        #     if j % 5:
+        #         print("Sample: %s: Loss: %s" % (j+1, loss.data[0]))
+        #
+        #     training_optimizer.zero_grad()
+        #     loss.backward()
+        #     training_optimizer.step()
         save_model(network, '../model_param/neural_network_param_%s' % i)
 
 
@@ -163,16 +202,22 @@ def test(testset, user_feature, product_feature, model_path):
         product_id = data[1]
         label = data[-1]
 
-        user_self_vector, user_desc_vector = user_feature[person_id]
+        user_self_vector = user_feature[person_id][:9]
+        user_desc_vector = user_feature[person_id][9]
 
-        product_self_vector, product_desc_vector = product_feature[product_id]
+        product_self_vector = product_feature[product_id][:6]
+        product_desc_vector = product_feature[product_id][6]
 
-        prob = output(
-            network,
-            user_self_vector,
-            user_desc_vector,
-            product_self_vector,
-            product_desc_vector
+        user_self_vector = Variable(torch.FloatTensor(user_self_vector))
+        user_desc_vector = Variable(torch.FloatTensor(user_desc_vector))
+        product_desc_vector = Variable(torch.FloatTensor(product_desc_vector))
+        product_self_vector = Variable(torch.FloatTensor(product_self_vector))
+
+        prob = network(
+            product_vector=product_self_vector,
+            user_vector=user_self_vector,
+            user_desc_vector=user_desc_vector,
+            product_desc_vector=product_desc_vector
         )
 
         labels.append(label)
@@ -190,9 +235,11 @@ def predict(predict_set, user_feature, product_feature, model_path):
         person_id = data[0]
         product_id = data[1]
 
-        user_self_vector, user_desc_vector = user_feature[person_id]
+        user_self_vector = user_feature[person_id][:9]
+        user_desc_vector = user_feature[person_id][9]
 
-        product_self_vector, product_desc_vector = product_feature[product_id]
+        product_self_vector = product_feature[product_id][:6]
+        product_desc_vector = product_feature[product_id][6]
 
         prob = output(
             network,

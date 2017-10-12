@@ -185,7 +185,7 @@ def construct_product_features():
 
 if __name__ == '__main__':
 
-    embedding_dict = gen_all_product_embedding_info(53900, 512)
+    embedding_dict = gen_all_product_embedding_info(53900, 256)
 
     with open('model_param/product_embedding.pkl', 'wb') as f:
         pickle.dump(embedding_dict, f)

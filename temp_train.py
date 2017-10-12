@@ -15,7 +15,7 @@ from torch.autograd import Variable
 import cPickle as pickle
 from data_process import load_dataset
 
-USER_VECTOR_SIZE = 8
+USER_VECTOR_SIZE = 9
 PRODUCT_VECTOR_SIZE = 6
 
 class NeuralNetwork(nn.Module):
@@ -58,7 +58,7 @@ class NeuralNetwork(nn.Module):
         )
 
         hidden = F.leaky_relu(
-            self.hidden_layer_1(torch.cat([user_layer, merchandise_layer])),
+            self.hidden_layer_1(torch.cat([user_layer, merchandise_layer], dim=1)),
             negative_slope=0.2
         )
 
@@ -77,6 +77,7 @@ class NeuralNetwork(nn.Module):
         )
 
         return output
+
 
 class SimpleNetwork(nn.Module):
     
@@ -102,11 +103,9 @@ def load_model(path):
     return network
 
 
-def output(network, user_self_vector, product_self_vector):
-    user_self_vector = Variable(torch.FloatTensor(user_self_vector))
-    # user_desc_vector = Variable(torch.FloatTensor(user_desc_vector))
-    # product_desc_vector = Variable(torch.FloatTensor(product_desc_vector))
-    product_self_vector = Variable(torch.FloatTensor(product_self_vector))
+def output(network, user_self_vectors, product_self_vectors):
+    user_self_vector = Variable(torch.FloatTensor(user_self_vectors)).unsqueeze(0)
+    product_self_vector = Variable(torch.FloatTensor(product_self_vectors)).unsqueeze(0)
 
     prob = network(
         product_vector=product_self_vector,
@@ -118,7 +117,7 @@ def output(network, user_self_vector, product_self_vector):
     return prob
 
 
-def train(trainset, epoch, user_feature, product_feature):
+def train(trainset, batch_size, epoch, user_feature, product_feature):
 
     learning_rate = 0.00001
 
@@ -132,28 +131,30 @@ def train(trainset, epoch, user_feature, product_feature):
     for i in range(epoch):
         iters = 0
 
-        for data in trainset:
+        for j in range(len(trainset)-batch_size):
+
+            user_self_vector = []
+            product_self_vector = []
+            labels = []
+
+            for p in range(batch_size):
+                person_id = trainset[p+j][0]
+                product_id = trainset[p+j][1]
+                user_self_vector.append(user_feature[person_id][:9])
+                product_self_vector.append(product_feature[product_id][:6])
+                labels.append(trainset[p+j][-1])
+
             iters += 1
-            person_id = data[0]
-            product_id = data[1]
-            label = data[-1]
-            user_self_vector = user_feature[person_id][:-1]
-            if user_feature[person_id] == []:
-                continue
 
-            product_self_vector = product_feature[product_id][:-1]
+            user_self_vector = Variable(torch.FloatTensor(user_self_vector))
+            product_self_vector = Variable(torch.FloatTensor(product_self_vector))
 
-            label = Variable(torch.LongTensor([label]))
-
-            prob = output(
-                network,
-                user_self_vector,
-                # user_desc_vector,
-                product_self_vector
-                # product_desc_vector
+            prob = network(
+                product_vector=product_self_vector,
+                user_vector=user_self_vector
             )
-            prob = prob.unsqueeze(0)
-            loss = loss_criterion(prob, label)
+
+            loss = loss_criterion(prob, labels)
             loss_ave += loss.data[0]
             if iters % 1000 == 0:
                 print("Sample: %s: Loss: %s" % (iters, loss_ave/1000.0))
@@ -183,9 +184,7 @@ def test(testset, user_feature, product_feature, model_path):
         prob = output(
             network,
             user_self_vector,
-            # user_desc_vector,
             product_self_vector
-            # product_desc_vector
         )
 
         labels.append(label)
@@ -210,14 +209,13 @@ def predict(predict_set, user_feature, product_feature, model_path):
         prob = output(
             network,
             user_self_vector,
-            # user_desc_vector,
             product_self_vector
-            # product_desc_vector
         )
 
         result.append(prob)
 
     return result
+
 
 if __name__ == "__main__":
     data1 = open("data/product_dict.pkl","rb")
