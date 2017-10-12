@@ -13,8 +13,8 @@ import torch.nn.functional as F
 import torch.optim as optimizer
 from torch.autograd import Variable
 
-USER_VECTOR_SIZE = 10
-PRODUCT_VECTOR_SIZE = 10
+USER_VECTOR_SIZE = 9
+PRODUCT_VECTOR_SIZE = 6
 
 
 class NeuralNetwork(nn.Module):
@@ -34,9 +34,8 @@ class NeuralNetwork(nn.Module):
         self.merchandise_layer = nn.Linear(640, 512)
 
         self.hidden_layer_1 = nn.Linear(1024, 1024)
-        self.hidden_layer_2 = nn.Linear(1024, 512)
-        self.hidden_layer_3 = nn.Linear(512, 64)
-        self.out = nn.Linear(64, 2)
+        self.hidden_layer_3 = nn.Linear(1024, 256)
+        self.out = nn.Linear(256, 2)
 
     def forward(self, product_vector, user_vector, user_desc_vector, product_desc_vector):
 
@@ -62,11 +61,6 @@ class NeuralNetwork(nn.Module):
 
         hidden = F.leaky_relu(
             self.hidden_layer_2(hidden),
-            negative_slope=0.5
-        )
-
-        hidden = F.leaky_relu(
-            self.hidden_layer_3(hidden),
             negative_slope=0.5
         )
 
@@ -106,7 +100,7 @@ def output(network, user_self_vector, user_desc_vector, product_self_vector, pro
     return prob
 
 
-def train(trainset, epoch, user_feature, product_feature):
+def train(trainset, epoch, user_feature, product_feature, embedding):
 
     learning_rate = 0.0001
 
@@ -117,14 +111,23 @@ def train(trainset, epoch, user_feature, product_feature):
     loss_criterion = torch.nn.CrossEntropyLoss()
 
     for i in range(epoch):
+        j = 0
         for data in trainset:
             person_id = data[0]
             product_id = data[1]
             label = data[-1]
+            if person_id not in user_feature or len(user_feature[person_id]) == 0:
+                print("--%s--" % j)
+                continue
+            user_self_vector = user_feature[person_id][:9]
+            m = 1 if user_self_vector[2] else 0
+            user_self_vector[2] = m
+            user_desc_vector = user_feature[person_id][9]
+            user_desc_vector = embedding(user_desc_vector)
 
-            user_self_vector, user_desc_vector = user_feature[person_id]
-
-            product_self_vector, product_desc_vector = product_feature[product_id]
+            product_self_vector = product_feature[product_id][:6]
+            product_desc_vector = product_feature[product_id][6]
+            product_desc_vector = embedding(product_desc_vector)
 
             label = Variable(torch.LongTensor([label]))
 
@@ -135,10 +138,12 @@ def train(trainset, epoch, user_feature, product_feature):
                 product_self_vector,
                 product_desc_vector
             )
+            prob = prob.unsqueeze(0)
             loss = loss_criterion(prob, label)
+            j += 1
 
-            if i % 10:
-                print("Sample: %s: Loss: %s" % (i+1, loss.data[0]))
+            if j % 5:
+                print("Sample: %s: Loss: %s" % (j+1, loss.data[0]))
 
             training_optimizer.zero_grad()
             loss.backward()

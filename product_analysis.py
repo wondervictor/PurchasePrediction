@@ -123,13 +123,11 @@ def gen_all_product_embedding_info(dict_dim, output_dim):
     def gen_embedding_vector(input, nums):
         result_vector = Variable(torch.zeros((1, output_dim)))
         if nums == 0:
-            return result_vector
+            return result_vector.data.numpy()
 
-        output = embedding(input)
-        for i in range(nums):
-            result_vector += output[i]
-
-        return result_vector
+        output = embedding(input).data.numpy()
+        result = np.sum(output, axis=0) / nums
+        return result
 
     products = process_product_info()
 
@@ -158,19 +156,17 @@ def gen_product_embedding(input, dict_dim=53900, output_dim=512):
     :param output_dim:
     :return:
     """
-
     embedding = torch_nn.Embedding(dict_dim, output_dim)
     nums = len(input)
     input = Variable(torch.LongTensor(input))
     result_vector = Variable(torch.zeros((1, output_dim)))
     if nums == 0:
-        return result_vector
+        return result_vector.data.numpy()
 
-    output = embedding(input)
-    for i in range(nums):
-        result_vector += output[i]
+    output = embedding(input).data.numpy()
+    result = np.sum(output, axis=0)/nums
 
-    return result_vector
+    return result
 
 
 # 构建特征

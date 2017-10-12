@@ -6,8 +6,7 @@ import os.path
 import sys
 import multiprocessing
 from gensim.models.word2vec import LineSentence
-from gensim.models import Word2Ve
-c
+from gensim.models import Word2Vec
 import numpy as np
 from scipy.spatial.distance import cosine
 from data_process import process_user_info
@@ -39,10 +38,10 @@ def similarity_embedding(embed_a, embed_b):
         model.save(outp1)
         mdoel.wv.save_word2vec_format(outp2,binary=False)
 
-    ```
-    calculate cosine 
-    ```
+    '''
+        calculate cosine 
 
+    '''
 
     return get_similarity(embed_a, embed_b)
 

@@ -78,6 +78,7 @@ def bulid_all_users_feature(all_users, products_dict, products_feature):
 
     return users_fearture
 
+
 def get_products_feature():
     print("start build products feature")
     datas = process_product_info()
@@ -89,6 +90,7 @@ def get_products_feature():
     print("build products feature.")
     return product_dict
 
+
 def build_product_input(products, behavior):
     favorite = behavior[1]
     bought = behavior[3]
@@ -99,7 +101,7 @@ def build_product_input(products, behavior):
     print(len(shop_bought),len(shop_favorite),len(brand_bought),len(brand_favorite))
     i = 0
     for product_id in prod_feature.keys():
-        prod_feature[product_id].pop()
+        # prod_feature[product_id].pop()
         shop_id = prod_feature[product_id][0]
         brand_id = prod_feature[product_id][1]
         try:
