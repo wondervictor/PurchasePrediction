@@ -52,7 +52,7 @@ def cf_person_based(rank):
         pass
 
     users = process_user_info()
-    
+
 
 
 
