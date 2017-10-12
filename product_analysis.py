@@ -183,13 +183,15 @@ def construct_product_features():
     4. 商品是否浏览过、收藏过、加购过
     :return:
     """
+
     pass
 
 
 if __name__ == '__main__':
 
-    embedding_dict = gen_all_product_embedding_info(53900, 1000)
+    embedding_dict = gen_all_product_embedding_info(53900, 512)
 
-    print(len(embedding_dict))
+    with open('model_param/product_embedding.pkl', 'wb') as f:
+        pickle.dump(embedding_dict, f)
 
 

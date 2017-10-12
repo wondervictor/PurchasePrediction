@@ -286,31 +286,41 @@ def generate_dataset(testing_size):
 
     notbuying_data = notbuying_action_1 + notbuying_action_2 + notbuying_action_3
 
-    buying_data = [x.append(1) for x in buying_data]
-    notbuying_data = [x.append(0) for x in notbuying_data]
+    def add_label(label):
+        def func(x):
+            x.append(label)
+            return x
+        return func
 
+    pos_add_label = add_label(1)
+    neg_add_label = add_label(0)
+    buying_data = map(pos_add_label, buying_data) #[x.append(1) for x in buying_data]
+    notbuying_data = map(neg_add_label, notbuying_data) #[x.append(0) for x in notbuying_data]
     # shuffle
+
     random.shuffle(buying_data)
     random.shuffle(notbuying_data)
 
     train_data_pos = buying_data[:-testing_size/2]
     train_data_neg = notbuying_data[:-testing_size/2]
 
-    test_data_pos = buying_data[testing_size/2:]
-    test_data_neg = notbuying_data[testing_size/2:]
+    test_data_pos = buying_data[-testing_size/2:]
+    test_data_neg = notbuying_data[-testing_size/2:]
 
     train_data = train_data_neg + train_data_pos
     test_data = test_data_neg + test_data_pos
-
     random.shuffle(train_data)
     random.shuffle(test_data)
-
     return train_data, test_data
 
 
 if __name__ == '__main__':
 
-    split_five_days_3_behavior()
+    train_data, test_data = generate_dataset(10000)
+    print(len(train_data), len(test_data))
+    write_to_file(train_data, 'data/train_data.txt')
+    write_to_file(test_data, 'data/test_data.txt')
+
 
 
 

@@ -20,9 +20,6 @@ if __name__ == "__main__":
     #构建一个dict，每个key是商品id，value是商品的原始信息
     products_feature = get_products_feature()
 
-    
-  
-   
 
     product_input = build_product_input(products_feature, behavior)  
     product_file = open("data/product_dict.pkl","wb")   

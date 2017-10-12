@@ -17,7 +17,7 @@ def similarity_embedding(embed_a, embed_b):
     return get_similarity(embed_a, embed_b)
 
 
-def similarity_self(self_a, self_b):
+def similarity_person_self(self_a, self_b):
     """
     固有特征
     :param self_a:
@@ -41,7 +41,7 @@ def cf_product_based(all_products, user_product):
     pass
 
 
-def cf_person_based(rank):
+def cf_person_based(rank, user_dict):
     """
     基于人的协同过滤
     :rank: 选取rank名相似用户进行推荐
@@ -49,14 +49,17 @@ def cf_person_based(rank):
     """
     def sim(person_a, person_b):
 
-        pass
+        return 0
 
     users = process_user_info()
 
+    num_user = len(users)
 
+    person_similarity_matrix = np.zeros((num_user, num_user))
 
-
-
+    for i in range(num_user):
+        for j in range(num_user):
+            person_similarity_matrix[i][j] = sim(user_dict[users[i].user_id], user_dict[users[j].user_id])
 
     pass
 

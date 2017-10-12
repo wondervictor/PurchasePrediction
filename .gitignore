@@ -117,3 +117,5 @@ user_info.txti
 
 # Output
 output
+model_param
+*.pkl
