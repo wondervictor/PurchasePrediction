@@ -32,7 +32,7 @@ def extract_features_from_product(products, feature_dict):
         #     product_bought.append(product)
         #     price.append(product_data[3])
     # freq = len(product_bought)
-    price.append(product_data[3])
+        price.append(product_data[3])
     if freq == 0:
         return 0
     ave_price = sum(price)/float(freq)
