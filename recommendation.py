@@ -1,10 +1,22 @@
 # -*- coding: utf-8 -*-
-
+import warnings
+warnings.filterwarnings(action='ignore',category=UserWarning,module='gensim')
+import logging
+import os.path
+import sys
+import multiprocessing
+from gensim.models.word2vec import LineSentence
+from gensim.models import Word2Ve
+c
 import numpy as np
 from scipy.spatial.distance import cosine
 from data_process import process_user_info
 from behavior_analysis import process_user_behaviors, filter_time, write_to_file, date_to_timestamp
 from product_analysis import get_similarity
+
+
+
+
 
 
 def similarity_embedding(embed_a, embed_b):
@@ -14,6 +26,24 @@ def similarity_embedding(embed_a, embed_b):
     :param embed_b:
     :return:
     """
+    if __name__ == '__main__':
+        program=os.path.basename(sys.argv[0])
+        logger=logging.getLogger(program)
+        logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',level=logging.INFO)
+        logger.info('running %s'%' '.join(sys.argv))
+        fdir='Desktop/data/'
+        inp=fdir+'data.txt'
+        outp1=fdir+'text.model'
+        outp2=fdir+'text.vector'
+        model=Word2Vec(LineSentence(inp),size=400,window=5,min_count=5,workers=multiprocessing.cpu_count())
+        model.save(outp1)
+        mdoel.wv.save_word2vec_format(outp2,binary=False)
+
+    ```
+    calculate cosine 
+    ```
+
+
     return get_similarity(embed_a, embed_b)
 
 
@@ -109,9 +139,3 @@ def gen_recommendation_data():
 if __name__ == '__main__':
 
     gen_recommendation_data()
-
-
-
-
-
-
