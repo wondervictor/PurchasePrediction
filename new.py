@@ -71,10 +71,13 @@ def bulid_all_users_feature(all_users, products_dict, products_feature):
     构建一个用户字典，key为用户id，value为特征
     """
     users_fearture = {}
+    i = 0
     for user in all_users:
         id = user.id
+        i += 1
         #构建的用户特征是一个长度为 的数组
         users_fearture[id] = build_user_features(user, products_dict, products_feature)
+        print(i)
 
     return users_fearture
 
@@ -99,7 +102,7 @@ def build_product_input(products, behavior):
     print(len(shop_bought),len(shop_favorite),len(brand_bought),len(brand_favorite))
     i = 0
     for product_id in prod_feature.keys():
-        prod_feature[product_id].pop()
+        # prod_feature[product_id].pop()
         shop_id = prod_feature[product_id][0]
         brand_id = prod_feature[product_id][1]
         try:

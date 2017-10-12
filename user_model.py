@@ -42,6 +42,7 @@ def extract_features_from_product(products, feature_dict):
     '''
     feature.append(all_discribes)
 
+
     return feature
 
 
