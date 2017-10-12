@@ -15,7 +15,7 @@ from torch.autograd import Variable
 import cPickle as pickle
 from data_process import load_dataset
 
-USER_VECTOR_SIZE = 9
+USER_VECTOR_SIZE = 8
 PRODUCT_VECTOR_SIZE = 6
 
 class NeuralNetwork(nn.Module):
@@ -140,12 +140,11 @@ def train(trainset, batch_size, epoch, user_feature, product_feature):
             for p in range(batch_size):
                 person_id = trainset[p+j][0]
                 product_id = trainset[p+j][1]
-                user_self_vector.append(user_feature[person_id][:9])
+                user_self_vector.append(user_feature[person_id][:8])
                 product_self_vector.append(product_feature[product_id][:6])
                 labels.append(trainset[p+j][-1])
 
             iters += 1
-
             user_self_vector = Variable(torch.FloatTensor(user_self_vector))
             product_self_vector = Variable(torch.FloatTensor(product_self_vector))
 
@@ -154,6 +153,7 @@ def train(trainset, batch_size, epoch, user_feature, product_feature):
                 user_vector=user_self_vector
             )
 
+            labels = Variable(torch.LongTensor(labels))
             loss = loss_criterion(prob, labels)
             loss_ave += loss.data[0]
             if iters % 1000 == 0:
@@ -219,7 +219,7 @@ def predict(predict_set, user_feature, product_feature, model_path):
 
 if __name__ == "__main__":
     data1 = open("data/product_dict.pkl","rb")
-    data2 = open("data/user_dict3.pkl","rb")
+    data2 = open("data/user_dict.pkl","rb")
     product_dict = pickle.load(data1)
     user_dict = pickle.load(data2)
     data1.close()
@@ -228,4 +228,4 @@ if __name__ == "__main__":
     trainset = load_dataset('data/train_data.txt')
     testset = load_dataset('data/test_data.txt')
     
-    train(trainset, 30, user_dict, product_dict)
+    train(trainset, 32, 30, user_dict, product_dict)

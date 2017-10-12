@@ -13,7 +13,7 @@ import torch.nn.functional as F
 import torch.optim as optimizer
 from torch.autograd import Variable
 
-USER_VECTOR_SIZE = 9
+USER_VECTOR_SIZE = 8
 PRODUCT_VECTOR_SIZE = 6
 
 
@@ -124,8 +124,8 @@ def train(trainset, batch_size, epoch, user_feature, product_feature):
             for p in range(batch_size):
                 person_id = trainset[p+j][0]
                 product_id = trainset[p+j][1]
-                user_self_vector.append(user_feature[person_id][:9])
-                user_desc_vector.append(user_feature[person_id][9])
+                user_self_vector.append(user_feature[person_id][:8])
+                user_desc_vector.append(user_feature[person_id][8])
                 product_self_vector.append(product_feature[product_id][:6])
                 product_desc_vector.append(product_feature[product_id][6])
                 labels.append(trainset[p+j][-1])
@@ -202,8 +202,8 @@ def test(testset, user_feature, product_feature, model_path):
         product_id = data[1]
         label = data[-1]
 
-        user_self_vector = user_feature[person_id][:9]
-        user_desc_vector = user_feature[person_id][9]
+        user_self_vector = user_feature[person_id][:8]
+        user_desc_vector = user_feature[person_id][8]
 
         product_self_vector = product_feature[product_id][:6]
         product_desc_vector = product_feature[product_id][6]
@@ -235,8 +235,8 @@ def predict(predict_set, user_feature, product_feature, model_path):
         person_id = data[0]
         product_id = data[1]
 
-        user_self_vector = user_feature[person_id][:9]
-        user_desc_vector = user_feature[person_id][9]
+        user_self_vector = user_feature[person_id][:8]
+        user_desc_vector = user_feature[person_id][8]
 
         product_self_vector = product_feature[product_id][:6]
         product_desc_vector = product_feature[product_id][6]
