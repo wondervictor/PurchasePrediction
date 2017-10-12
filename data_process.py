@@ -363,6 +363,18 @@ def remove_unactive(under_action=1):
     print("Clear Finished")
 
 
+def load_dataset(path):
+
+    with open(path, 'r') as f:
+        behavior_lines = f.readlines()
+
+    behavior_elements = [map(int, split_t(x)) for x in behavior_lines]
+
+    del behavior_lines
+
+    return behavior_elements
+
+
 if __name__ == '__main__':
 
     remove_unactive()
