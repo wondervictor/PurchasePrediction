@@ -35,9 +35,13 @@ def extract_features_from_product(products, feature_dict):
     ave_price = sum(price)/float(freq)
     max_price = max(price)
     min_price = min(price)
-    feature = [ave_price, max_price, min_price, freq]       
-    discribe_vector = gen_product_embedding(all_discribes)
-    feature.append(discribe_vector)
+    feature = [ave_price, max_price, min_price, freq]
+    '''
+    remove embedding直接返回分词ID
+    #discribe_vector = gen_product_embedding(all_discribes)
+    '''
+    feature.append(all_discribes)
+
     return feature
 
 
@@ -45,8 +49,8 @@ def extract_features_from_product(products, feature_dict):
     # for product in products:
     #     temp_vector.append(feature_dict[product[0]])
 
-    feature = []
-    return feature
+    # feature = []
+    # return feature
 
 
 def build_user_features(user, products_dict, products_feature):
@@ -66,7 +70,7 @@ def build_user_features(user, products_dict, products_feature):
     if feature_from_product == 0:
         return []
     feature = user_feature + feature_from_product
-    return user_feature
+    return feature
 
 
 

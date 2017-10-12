@@ -10,7 +10,6 @@ from model import network
 from data_process import load_dataset
 
 
-
 def prepare_data():
 
     """
