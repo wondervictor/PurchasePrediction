@@ -365,6 +365,7 @@ def generate_dataset(testing_size=20000):
 
     return train_data, predict_data
 
+
 if __name__ == '__main__':
 
     train_data, test_data = generate_dataset()
