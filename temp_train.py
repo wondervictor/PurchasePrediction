@@ -20,43 +20,50 @@ USER_VECTOR_SIZE = 8
 PRODUCT_VECTOR_SIZE = 6
 
 class NeuralNetwork(nn.Module):
-
+    
     def __init__(self):
 
         super(NeuralNetwork, self).__init__()
 
         # self.user_merchandise_layer = nn.Linear(512, 512)
         self.user_self_layer = nn.Linear(USER_VECTOR_SIZE, 64)
-
+        self.bn1 = nn.BatchNorm1d(64)
+        
         # self.merchandise_description_layer = nn.Linear(512, 512)
         self.merchandise_self_layer = nn.Linear(PRODUCT_VECTOR_SIZE, 64)
+        self.bn2 = nn.BatchNorm1d(64)
+        
+        self.user_layer = nn.Linear(64, 128)
+        self.bn3 = nn.BatchNorm1d(128)
+        self.merchandise_layer = nn.Linear(64, 128)
+        self.bn4 = nn.BatchNorm1d(128)
 
-        self.user_layer = nn.Linear(64, 256)
+        self.hidden_layer_1 = nn.Linear(256, 256)
+        
+        self.hidden_layer_2 = nn.Linear(256, 32)
+        self.bn5 = nn.BatchNorm1d(32)
 
-        self.merchandise_layer = nn.Linear(64, 256)
-
-        self.hidden_layer_1 = nn.Linear(512, 1024)
-        self.hidden_layer_2 = nn.Linear(1024, 512)
-        self.hidden_layer_3 = nn.Linear(512, 64)
-        self.out = nn.Linear(64, 2)
+        self.out = nn.Linear(32, 2)
 
     def forward(self, product_vector, user_vector):
 
-        # user_desc = F.relu(self.user_merchandise_layer(user_desc_vector))
-
         user_self = F.leaky_relu(self.user_self_layer(user_vector), negative_slope=0.2)
-        # merchandise_desc = F.relu(self.merchandise_description_layer(product_desc_vector))
+        user_self = self.bn1(user_self)
+
         merchandise_self = F.leaky_relu(self.merchandise_self_layer(product_vector), negative_slope=0.2)
+        merchandise_self = self.bn2(merchandise_self)
 
         user_layer = F.leaky_relu(
             self.user_layer(user_self),
             negative_slope=0.2
         )
+        user_layer = self.bn3(user_layer)
 
         merchandise_layer = F.leaky_relu(
             self.merchandise_layer(merchandise_self),
             negative_slope=0.2
         )
+        merchandise_layer = self.bn4(merchandise_layer)
 
         hidden = F.leaky_relu(
             self.hidden_layer_1(torch.cat([user_layer, merchandise_layer], dim=1)),
@@ -67,11 +74,17 @@ class NeuralNetwork(nn.Module):
             self.hidden_layer_2(hidden),
             negative_slope=0.2
         )
+        hidden = self.bn5(hidden)
 
-        hidden = F.leaky_relu(
-            self.hidden_layer_3(hidden),
-            negative_slope=0.2
-        )
+        # hidden = F.leaky_relu(
+        #     self.hidden_layer_2(hidden),
+        #     negative_slope=0.2
+        # )
+
+        # hidden = F.leaky_relu(
+        #     self.hidden_layer_3(hidden),
+        #     negative_slope=0.2
+        # )
 
         output = F.softmax(
             self.out(hidden)
@@ -120,7 +133,7 @@ def output(network, user_self_vectors, product_self_vectors):
 
 def train(trainset, batch_size, epoch, user_feature, product_feature):
 
-    learning_rate = 0.00001
+    learning_rate = 0.0005
 
     network = NeuralNetwork()
 
@@ -128,24 +141,26 @@ def train(trainset, batch_size, epoch, user_feature, product_feature):
 
     loss_criterion = torch.nn.CrossEntropyLoss()
     
+    count = 0
     loss_ave = 0
     for i in range(epoch):
         iters = 0
-
-        for j in range(0, batch_size, len(trainset)-batch_size):
-
+        temp = 0
+        epoch_loss = 0
+        for j in range(len(trainset)/batch_size):
+            temp += 1
+            iters += 1
             user_self_vector = []
             product_self_vector = []
             labels = []
-
+        
             for p in range(batch_size):
                 person_id = trainset[p+j][0]
                 product_id = trainset[p+j][1]
-                user_self_vector.append(user_feature[person_id][:8])
-                product_self_vector.append(product_feature[product_id][:6])
+                user_self_vector.append(user_feature[person_id][:11])
+                product_self_vector.append(product_feature[product_id][:10])
                 labels.append(trainset[p+j][-1])
 
-            iters += 1
             user_self_vector = Variable(torch.FloatTensor(user_self_vector))
             product_self_vector = Variable(torch.FloatTensor(product_self_vector))
 
@@ -157,15 +172,23 @@ def train(trainset, batch_size, epoch, user_feature, product_feature):
             labels = Variable(torch.LongTensor(labels))
             loss = loss_criterion(prob, labels)
             loss_ave += loss.data[0]
-            if iters % 1000 == 0:
-                print("Sample: %s: Loss: %s" % (iters, loss_ave/1000.0))
+            epoch_loss += loss.data[0]
+            if iters%100 == 0:
+                print("Epoch: %s Sample: %s: Loss: %s" % (i, iters, loss_ave/100.0))
                 loss_ave = 0
 
             training_optimizer.zero_grad()
             loss.backward()
-
+            # for param in network.parameters():
+            #     print(param.grad)
+            if epoch == 15:
+                for param_group in training_optimizer.param_groups:
+                    learning_rate = learning_rate/5.0
+                    param_group['lr'] = learning_rate
             training_optimizer.step()
-        save_model(network, './model_param/neural_network_param_%s' % i)
+        print("loss: %s", epoch_loss/float(temp))
+
+        save_model(network, './model_param/deep1_neural_network_param_%s' % i)
 
 
 def test(testset, user_feature, product_feature, model_path):
@@ -215,6 +238,7 @@ def predict(predict_set, user_feature, product_feature, model_path):
         )
         prob = prob.squeeze(0)
         prob = prob.data.numpy()
+        print(prob)
         if prob[0] < prob[1]:
             result.append((person_id, product_id))
 
@@ -222,8 +246,8 @@ def predict(predict_set, user_feature, product_feature, model_path):
 
 
 if __name__ == "__main__":
-    data1 = open("data/product_dict.pkl","rb")
-    data2 = open("data/user_dict.pkl","rb")
+    data1 = open("data/product_dict1.pkl","rb")
+    data2 = open("data/user_dict1.pkl","rb")
     product_dict = pickle.load(data1)
     user_dict = pickle.load(data2)
     data1.close()
@@ -231,6 +255,7 @@ if __name__ == "__main__":
 
     predicted = process_user_behaviors('data/predict.txt')
 
-    result = predict(predicted, user_feature=user_dict, product_feature=product_dict, model_path='model_param/neural_network_param_5')
+    result = predict(predicted, user_feature=user_dict, product_feature=product_dict, model_path='./model_param/deep1_neural_network_param_45')
+    # testset = load_dataset('data/test_data.txt')
 
     output_result(result)

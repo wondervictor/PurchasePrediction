@@ -230,6 +230,7 @@ def not_buying():
     write_to_file(unpurchased_data, 'data/behaviors/notbuying.txt')
 
 
+
 def collect_user_product(action):
 
     """
@@ -241,14 +242,20 @@ def collect_user_product(action):
     action_data = process_user_behaviors('data/behaviors/action_%s.txt' % action)
 
     user_product = {}
+    product_freq = {}
 
     for element in action_data:
         if element[0] not in user_product:
             user_product[element[0]] = []
         user_product[element[0]].append(element[1])
+        try:
+            product_freq[element[1]] += 1
+        except:
+            product_freq[element[1]] = 1
 
     print("read action_%s.txt" % action)
-    return user_product
+    return user_product, product_freq
+
 
 
 # 构造训练集:
