@@ -1,1 +1,0 @@
-Correct: 5000 ACC: 0.5
