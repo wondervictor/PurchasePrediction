@@ -188,7 +188,7 @@ def train(trainset, batch_size, epoch, user_feature, product_feature):
             training_optimizer.step()
         print("loss: %s", epoch_loss/float(temp))
 
-        save_model(network, './model_param/deep1_neural_network_param_%s' % i)
+        save_model(network, './model_param/deep1_neural_network_param_%s.pkl' % i)
 
 
 def test(testset, user_feature, product_feature, model_path):
@@ -238,7 +238,7 @@ def predict(predict_set, user_feature, product_feature, model_path):
         )
         prob = prob.squeeze(0)
         prob = prob.data.numpy()
-        print(prob)
+
         if prob[0] < prob[1]:
             result.append((person_id, product_id))
 
