@@ -6,27 +6,63 @@
 
 """
 import pickle
+import torch
+import torch.nn as torch_nn
+from torch.autograd import Variable
+import numpy as np
 from model.network import train, test
 from data_process import load_dataset
+import evaluation
 from product_analysis import gen_product_embedding
 
 
+DICT_DIM = 53900
+OUTPUT_DIM = 256
+
 def generate_user_embedding(user_dict):
 
+    embedding = torch_nn.Embedding(DICT_DIM, OUTPUT_DIM)
+
+    def gen(input):
+        nums = len(input)
+        input = Variable(torch.LongTensor(input))
+        result_vector = Variable(torch.zeros((1, OUTPUT_DIM)))
+        if nums == 0:
+            return result_vector.data.numpy()
+
+        output = embedding(input).data.numpy()
+        result = np.sum(output, axis=0) / nums
+        return result
+
     for key in user_dict.keys():
-        describe = user_dict[key][9]
-        describe_embedding = gen_product_embedding(describe, output_dim=256)
-        user_dict[key][9] = describe_embedding
+        #print(key, user_dict[key])
+        describe = user_dict[key][8]
+        #print(len(user_dict[key]))
+        describe_embedding = gen(describe)
+        user_dict[key][8] = describe_embedding
 
     return user_dict
 
 
 def generate_product_embedding(product_dict):
 
+    embedding = torch_nn.Embedding(DICT_DIM, OUTPUT_DIM)
+
+    def gen(input):
+        nums = len(input)
+        input = Variable(torch.LongTensor(input))
+        result_vector = Variable(torch.zeros((1, OUTPUT_DIM)))
+        if nums == 0:
+            return result_vector.data.numpy()
+
+        output = embedding(input).data.numpy()
+        result = np.sum(output, axis=0) / nums
+        return result
+
     for key in product_dict.keys():
 
         describe = product_dict[key][6]
-        describe_embedding = gen_product_embedding(describe, output_dim=256)
+        describe_embedding = gen(describe)
 
         product_dict[key][6] = describe_embedding
 
@@ -77,25 +113,47 @@ def prepare_training_data():
 
 def prepare_dict():
 
-    user_dict, product_dict = load_dict()
-    product_dict = generate_product_embedding(product_dict)
+
+    user_file = open("data/user_dict.pkl",'rb')
+    user_dict = pickle.load(user_file)
+    user_file.close()
+    print("Finished Loading User Dict")
+
+    # product_file = open("data/product_dict.pkl","rb")
+    # product_dict = pickle.load(product_file)
+    # product_file.close()
+    # print("Finished Loading Product Dict")
+
+    #product_dict = generate_product_embedding(product_dict)
     user_dict = generate_user_embedding(user_dict)
+
+    #print(product_dict[product_dict.keys[0]])
+
 
     user_file = open("data/user_dict_embedding.pkl",'wb')
     pickle.dump(user_dict, user_file)
     user_file.close()
-
-    user_file = open("data/product_dict_embedding.pkl",'wb')
-    pickle.dump(product_dict, user_file)
-    user_file.close()
+    #
+    # user_file = open("data/product_dict_embedding.pkl",'wb')
+    # pickle.dump(product_dict, user_file)
+    # user_file.close()
     print("Saved")
 
 
 if __name__ == '__main__':
 
-    prepare_dict()
+    # prepare_dict()
 
-    #trainset, testset, user_dict, product_dict = prepare_training_data()
+    trainset, testset, user_dict, product_dict = prepare_training_data()
 
-    #train(trainset, epoch=10, user_feature=user_dict, product_feature=product_dict)
+    # print(user_dict[user_dict.keys()[1]])
+    # print(product_dict[product_dict.keys()[1]])
+    #for i in product_dict.keys()[185153:185185]:
+    #    print(product_dict[i])
+    #print(len(trainset))
+    eva =  evaluation.evaluate
+    train(trainset, batch_size=32, epoch=10, user_feature=user_dict, product_feature=product_dict, test_set=testset, evaluate=eva)
+    #labels, result = test(testset,user_feature=user_dict, product_feature=product_dict, model_path='model_param/neural_network_param_2')
+    #evaluation.evaluate(result, labels)
+
 

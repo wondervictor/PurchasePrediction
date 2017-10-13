@@ -5,8 +5,8 @@ import logging
 import os.path
 import sys
 import multiprocessing
-from gensim.models.word2vec import LineSentence
-from gensim.models import Word2Vec
+# from gensim.models.word2vec import LineSentence
+# from gensim.models import Word2Vec
 import numpy as np
 from scipy.spatial.distance import cosine
 from data_process import process_user_info
@@ -18,32 +18,32 @@ from product_analysis import get_similarity
 
 
 
-def similarity_embedding(embed_a, embed_b):
-    """
-    获得相似度 / embedding 特征
-    :param embed_a:
-    :param embed_b:
-    :return:
-    """
-    if __name__ == '__main__':
-        program=os.path.basename(sys.argv[0])
-        logger=logging.getLogger(program)
-        logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',level=logging.INFO)
-        logger.info('running %s'%' '.join(sys.argv))
-        fdir='Desktop/data/'
-        inp=fdir+'data.txt'
-        outp1=fdir+'text.model'
-        outp2=fdir+'text.vector'
-        model=Word2Vec(LineSentence(inp),size=400,window=5,min_count=5,workers=multiprocessing.cpu_count())
-        model.save(outp1)
-        mdoel.wv.save_word2vec_format(outp2,binary=False)
-
-    '''
-        calculate cosine 
-
-    '''
-
-    return get_similarity(embed_a, embed_b)
+# def similarity_embedding(embed_a, embed_b):
+#     """
+#     获得相似度 / embedding 特征
+#     :param embed_a:
+#     :param embed_b:
+#     :return:
+#     """
+#     if __name__ == '__main__':
+#         program=os.path.basename(sys.argv[0])
+#         logger=logging.getLogger(program)
+#         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',level=logging.INFO)
+#         logger.info('running %s'%' '.join(sys.argv))
+#         fdir='Desktop/data/'
+#         inp=fdir+'data.txt'
+#         outp1=fdir+'text.model'
+#         outp2=fdir+'text.vector'
+#         model=Word2Vec(LineSentence(inp),size=400,window=5,min_count=5,workers=multiprocessing.cpu_count())
+#         model.save(outp1)
+#         mdoel.wv.save_word2vec_format(outp2,binary=False)
+#
+#     '''
+#         calculate cosine
+#
+#     '''
+#
+#     return get_similarity(embed_a, embed_b)
 
 
 def similarity_person_self(self_a, self_b):
@@ -99,7 +99,7 @@ def gen_recommendation_data():
 
     action_1 = process_user_behaviors('data/behaviors/action_1.txt')
 
-    start_time = "2017-7-20 00:00:00"
+    start_time = "2017-8-23 00:00:00"
     end_time = -1
 
     predicted_data += filter_time(action_1,  date_to_timestamp(start_time), end_time)
@@ -108,7 +108,7 @@ def gen_recommendation_data():
 
     action_2 = process_user_behaviors('data/behaviors/action_2.txt')
 
-    start_time = "2017-7-19 00:00:00"
+    start_time = "2017-8-19 00:00:00"
     end_time = -1
 
     predicted_data += filter_time(action_2, date_to_timestamp(start_time), end_time)
@@ -116,7 +116,7 @@ def gen_recommendation_data():
 
     action_3 = process_user_behaviors('data/behaviors/action_3.txt')
 
-    start_time = "2017-7-18 00:00:00"
+    start_time = "2017-8-18 00:00:00"
     end_time = -1
 
     predicted_data += filter_time(action_3,  date_to_timestamp(start_time), end_time)
@@ -125,7 +125,7 @@ def gen_recommendation_data():
 
     action_4 = process_user_behaviors('data/behaviors/action_4.txt')
 
-    start_time = "2017-7-22 00:00:00"
+    start_time = "2017-8-22 00:00:00"
     end_time = -1
 
     predicted_data += filter_time(action_4,  date_to_timestamp(start_time), end_time)

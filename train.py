@@ -19,11 +19,11 @@ if __name__ == "__main__":
     
     #构建一个dict，每个key是商品id，value是商品的原始信息
     products_feature = get_products_feature()
-
-    product_input = build_product_input(products_feature, behavior)
-    product_file = open("data/product_dict.pkl","wb")
-    product_dict = pickle.dump(product_input, product_file)
-    product_file.close()
+    #
+    # product_input = build_product_input(products_feature, behavior)
+    # product_file = open("data/product_dict.pkl","wb")
+    # product_dict = pickle.dump(product_input, product_file)
+    # product_file.close()
 
     #构建一个用户特征dict，这个特征将会作为模型的输入，将所有用户的特征构建成一个key为用户id的dict返回
     user_feature_dict = bulid_all_users_feature(all_users, priducts_dict, products_feature)

@@ -134,7 +134,7 @@ def split_five_days_3_behavior():
     获取4天，用户加入购物车的商品，排除已经购买的
     :return:
     """
-    start_time = '2017-8-21 00:00:00'
+    start_time = '2017-8-20 12:00:00'
     end_time = '2017-8-25 23:59:59'
 
     start_time = date_to_timestamp(start_time)
@@ -149,7 +149,7 @@ def split_five_days_3_behavior():
     # _shopping = remove_purchased(purchased, shopping_cart)
 
     result = [(x[0], x[1]) for x in shopping_cart]
-    output.output_result(result)
+    output.output_result1(result)
 
 
 # 判断商品取消加入购物车
@@ -316,11 +316,12 @@ def generate_dataset(testing_size):
 
 if __name__ == '__main__':
 
-    train_data, test_data = generate_dataset(10000)
-    print(len(train_data), len(test_data))
-    write_to_file(train_data, 'data/train_data.txt')
-    write_to_file(test_data, 'data/test_data.txt')
+    # train_data, test_data = generate_dataset(10000)
+    # print(len(train_data), len(test_data))
+    # write_to_file(train_data, 'data/train_data.txt')
+    # write_to_file(test_data, 'data/test_data.txt')
 
 
+    split_five_days_3_behavior()
 
 

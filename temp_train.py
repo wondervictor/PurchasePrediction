@@ -13,7 +13,8 @@ import torch.nn.functional as F
 import torch.optim as optimizer
 from torch.autograd import Variable
 import cPickle as pickle
-from data_process import load_dataset
+from data_process import load_dataset, process_user_behaviors
+from output import output_result
 
 USER_VECTOR_SIZE = 8
 PRODUCT_VECTOR_SIZE = 6
@@ -131,7 +132,7 @@ def train(trainset, batch_size, epoch, user_feature, product_feature):
     for i in range(epoch):
         iters = 0
 
-        for j in range(len(trainset)-batch_size):
+        for j in range(0, batch_size, len(trainset)-batch_size):
 
             user_self_vector = []
             product_self_vector = []
@@ -162,6 +163,7 @@ def train(trainset, batch_size, epoch, user_feature, product_feature):
 
             training_optimizer.zero_grad()
             loss.backward()
+
             training_optimizer.step()
         save_model(network, './model_param/neural_network_param_%s' % i)
 
@@ -211,8 +213,10 @@ def predict(predict_set, user_feature, product_feature, model_path):
             user_self_vector,
             product_self_vector
         )
-
-        result.append(prob)
+        prob = prob.squeeze(0)
+        prob = prob.data.numpy()
+        if prob[0] < prob[1]:
+            result.append((person_id, product_id))
 
     return result
 
@@ -225,7 +229,8 @@ if __name__ == "__main__":
     data1.close()
     data2.close()
 
-    trainset = load_dataset('data/train_data.txt')
-    testset = load_dataset('data/test_data.txt')
-    
-    train(trainset, 32, 30, user_dict, product_dict)
+    predicted = process_user_behaviors('data/predict.txt')
+
+    result = predict(predicted, user_feature=user_dict, product_feature=product_dict, model_path='model_param/neural_network_param_5')
+
+    output_result(result)
