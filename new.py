@@ -7,12 +7,13 @@ from business import create_business_features
 from copy import deepcopy
 
 def get_all_behavior():
-    behavior_1 = collect_user_product(1)
-    behavior_2 = collect_user_product(2)
-    behavior_3 = collect_user_product(3)
-    behavior_4 = collect_user_product(4)
+    behavior_1, product_freq_1 = collect_user_product(1)
+    behavior_2, product_freq_2 = collect_user_product(2)
+    behavior_3, product_freq_3 = collect_user_product(3)
+    behavior_4, product_freq_4 = collect_user_product(4)
     behavior = [behavior_1, behavior_2, behavior_3, behavior_4]
-    return behavior
+    product_freq = [product_freq_1, product_freq_2, product_freq_3, product_freq_4]
+    return behavior, product_freq
 
 def get_product_user_relation(user, behavior):
     
@@ -94,17 +95,19 @@ def get_products_feature():
     return product_dict
 
 
-def build_product_input(products, behavior):
+def build_product_input(products, behavior, product_freq):
     favorite = behavior[1]
     bought = behavior[3]
+    behaviors = []
     prod_feature = {}
+    feature_1, feature_2, feature_3, feature_4 = product_freq
     for product in products.keys():
         prod_feature[product] = deepcopy(products[product])
     shop_bought,shop_favorite,brand_bought,brand_favorite = create_business_features(products, bought, favorite)
     print(len(shop_bought),len(shop_favorite),len(brand_bought),len(brand_favorite))
-    i = 0
+    i = 0               
+    j = 0
     for product_id in prod_feature.keys():
-        # prod_feature[product_id].pop()
         shop_id = prod_feature[product_id][0]
         brand_id = prod_feature[product_id][1]
         try:
@@ -133,7 +136,33 @@ def build_product_input(products, behavior):
             prod_feature[product_id].insert(3, brand_favorite[brand_id])
         except:
             prod_feature[product_id].insert(3, 0)
-    print(i)
+        
+        try:
+            prod_feature[product_id].insert(6, feature_1[product_id])
+        except:
+            j += 1
+            prod_feature[product_id].insert(6, 0)
+        try:
+            prod_feature[product_id].insert(7, feature_2[product_id])
+        except:
+            j += 1
+            prod_feature[product_id].insert(7, 0)
+        try:
+            prod_feature[product_id].insert(8, feature_3[product_id])
+        except:
+            j += 1
+            prod_feature[product_id].insert(8, 0)
+        try:
+            prod_feature[product_id].insert(9, feature_4[product_id])
+        except:
+            j += 1
+            prod_feature[product_id].insert(9, 0)
+
+
+
+
+                
+    print(i, j)
     return prod_feature
         
 

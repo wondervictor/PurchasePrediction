@@ -22,23 +22,44 @@ def extract_features_from_product(products, feature_dict):
     price = []
     product_bought = []
     freq = 0
+    look_freq = 0
+    buy_freq = 0
+    favorite_freq = 0
+    add_freq = 0
     for product in products:
         freq += 1
         product_id = product[0]
         product_data = feature_dict[product_id]
         discribes = product_data[4]
         all_discribes += discribes
-        # if product[1] == 4:
+        if product[1] == 1:
+            look_freq += 1
+        if product[1] == 2:
+            favorite_freq +=1
+        if product[1] == 3:
+            add_freq += 1
+        if product[1] == 4:
+            buy_freq += 1
+            
         #     product_bought.append(product)
         #     price.append(product_data[3])
     # freq = len(product_bought)
         price.append(product_data[3])
     if freq == 0:
         return 0
+    if buy_freq == 0:
+        look_buy = 0
+        favorite_buy = 0
+        add_buy = 0
+    else:
+        look_buy = look_freq/float(buy_freq)
+        favorite_buy = favorite_freq/float(buy_freq)
+        add_buy = add_freq/float(buy_freq)
     ave_price = sum(price)/float(freq)
     max_price = max(price)
     min_price = min(price)
-    feature = [ave_price, max_price, min_price, freq]
+    
+    feature = [ave_price, max_price, min_price, freq, look_buy, favorite_buy, add_buy]
     #discribe_vector = gen_product_embedding(all_discribes)
     feature.append(all_discribes)
 
@@ -71,7 +92,7 @@ def build_user_features(user, products_dict, products_feature):
     #根据用户买的商品的信息作为特征
     feature_from_product = extract_features_from_product(products, products_feature)
     if feature_from_product == 0:
-        feature_from_product = [0, 0, 0, 0, [0]]
+        return []
     feature = user_feature + feature_from_product
     return feature
 
