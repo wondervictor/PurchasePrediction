@@ -13,6 +13,8 @@ import numpy as np
 from model.network import train, test
 from data_process import load_dataset
 import evaluation
+from model import xgb_model
+from output import output_result
 from product_analysis import gen_product_embedding
 
 
@@ -146,14 +148,19 @@ if __name__ == '__main__':
 
     trainset, testset, user_dict, product_dict = prepare_training_data()
 
+    del trainset, testset
+
+    predict_set = load_dataset('data/predict.txt')
     # print(user_dict[user_dict.keys()[1]])
     # print(product_dict[product_dict.keys()[1]])
     #for i in product_dict.keys()[185153:185185]:
     #    print(product_dict[i])
     #print(len(trainset))
-    eva =  evaluation.evaluate
-    train(trainset, batch_size=32, epoch=10, user_feature=user_dict, product_feature=product_dict, test_set=testset, evaluate=eva)
-    #labels, result = test(testset,user_feature=user_dict, product_feature=product_dict, model_path='model_param/neural_network_param_2')
+    #eva = evaluation.evaluate
+    #train(trainset, batch_size=128, epoch=10, user_feature=user_dict, product_feature=product_dict, test_set=testset, evaluate=eva)
+    #labels, result = test(1, testset,user_feature=user_dict, product_feature=product_dict, model_path='model_param/neural_network_param_2')
     #evaluation.evaluate(result, labels)
 
-
+    #xgb_model.train(trainset, testset, user_dict, product_dict)
+    result = xgb_model.predict(predict_set, user_dict, product_dict)
+    output_result(result)

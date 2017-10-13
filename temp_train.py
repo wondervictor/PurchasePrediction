@@ -118,7 +118,7 @@ def output(network, user_self_vectors, product_self_vectors):
     return prob
 
 
-def train(trainset, batch_size, epoch, user_feature, product_feature):
+def train(testset, trainset, batch_size, epoch, user_feature, product_feature):
 
     learning_rate = 0.00001
 
@@ -165,7 +165,8 @@ def train(trainset, batch_size, epoch, user_feature, product_feature):
             loss.backward()
 
             training_optimizer.step()
-        save_model(network, './model_param/neural_network_param_%s' % i)
+        save_model(network, './model_param/neural_network_param2_%s' % i)
+        test(test_set, user_feature, product_feature, './model_param/neural_network_param2_%s' % i)
 
 
 def test(testset, user_feature, product_feature, model_path):
@@ -189,6 +190,8 @@ def test(testset, user_feature, product_feature, model_path):
             product_self_vector
         )
 
+        prob = prob.squeeze(0)
+        prob = prob.data.numpy()
         labels.append(label)
         result.append(prob)
 
@@ -229,8 +232,13 @@ if __name__ == "__main__":
     data1.close()
     data2.close()
 
-    predicted = process_user_behaviors('data/predict.txt')
+    train_set = load_dataset('data/train_data.txt')
+    test_set = load_dataset('data/test_data.txt')
 
-    result = predict(predicted, user_feature=user_dict, product_feature=product_dict, model_path='model_param/neural_network_param_5')
+    train(test_set, train_set, 64, 10, user_dict, product_dict)
 
-    output_result(result)
+    #predicted = process_user_behaviors('data/predict.txt')
+
+    #result = predict(predicted, user_feature=user_dict, product_feature=product_dict, model_path='model_param/neural_network_param_5')
+
+    #output_result(result)

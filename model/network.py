@@ -12,6 +12,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optimizer
 from torch.autograd import Variable
+import pprint
 
 USER_VECTOR_SIZE = 8
 PRODUCT_VECTOR_SIZE = 6
@@ -23,57 +24,70 @@ class NeuralNetwork(nn.Module):
 
         super(NeuralNetwork, self).__init__()
 
-        self.user_merchandise_layer = nn.Linear(256, 128)
+        #self.user_merchandise_layer = nn.Linear(256, 64)
         self.user_self_layer = nn.Linear(USER_VECTOR_SIZE, 64)
 
-        self.merchandise_description_layer = nn.Linear(256, 128)
+        #self.merchandise_description_layer = nn.Linear(256, 64)
         self.merchandise_self_layer = nn.Linear(PRODUCT_VECTOR_SIZE, 64)
 
-        self.user_layer = nn.Linear(192, 256)
+        #self.user_layer = nn.Linear(128, 256)
 
-        self.merchandise_layer = nn.Linear(192, 256)
-
-        self.hidden_layer_1 = nn.Linear(512, 1024)
-        self.hidden_layer_2 = nn.Linear(1024, 256)
-        self.out = nn.Linear(256, 2)
-        self.bn1 = nn.BatchNorm1d(256)
-        self.bn2 = nn.BatchNorm1d(1024)
+        #self.merchandise_layer = nn.Linear(128, 256)
+        self.hidden_layer_1 = nn.Linear(128, 64)
+        self.hidden_layer_2 = nn.Linear(64, 32)
+        self.out = nn.Linear(32, 2)
+        self.bn1 = nn.BatchNorm1d(32)
+        #self.bn2 = nn.BatchNorm1d(512)
 
     def forward(self, product_vector, user_vector, user_desc_vector, product_desc_vector):
 
-        user_desc = F.leaky_relu(self.user_merchandise_layer(user_desc_vector), negative_slope=0.5)
+        #user_desc = F.leaky_relu(self.user_merchandise_layer(user_desc_vector), negative_slope=0.5)
+
         user_self = F.leaky_relu(self.user_self_layer(user_vector), negative_slope=0.5)
-        merchandise_desc = F.leaky_relu(self.merchandise_description_layer(product_desc_vector), negative_slope=0.5)
+
+        #merchandise_desc = F.leaky_relu(self.merchandise_description_layer(product_desc_vector), negative_slope=0.5)
+
         merchandise_self = F.leaky_relu(self.merchandise_self_layer(product_vector), negative_slope=0.5)
 
-        user_layer = F.leaky_relu(
-            self.user_layer(torch.cat([user_desc, user_self], dim=1)),
-            negative_slope=1
-        )
-        user_layer = self.bn1(user_layer)
-        merchandise_layer = F.leaky_relu(
-            self.merchandise_layer(torch.cat([merchandise_desc, merchandise_self], dim=1)),
-            negative_slope=1
-        )
-        merchandise_layer = self.bn1(merchandise_layer)
+        # user_layer = F.leaky_relu(
+        #     self.user_layer(torch.cat([user_desc, user_self], dim=1)),
+        #     negative_slope=1
+        # )
+        #user_layer = self.bn1(user_self)
+
+
+
+        # merchandise_layer = F.leaky_relu(
+        #     self.merchandise_layer(torch.cat([merchandise_desc, merchandise_self], dim=1)),
+        #     negative_slope=1
+        # )
+
+        #merchandise_layer = self.bn1(merchandise_self)
+
 
         hidden = F.leaky_relu(
-            self.hidden_layer_1(torch.cat([user_layer, merchandise_layer], dim=1)),
+            self.hidden_layer_1(torch.cat([user_self, merchandise_self], dim=1)),
             negative_slope=0.5
         )
 
-        hidden = self.bn2(hidden)
 
         hidden = F.leaky_relu(
             self.hidden_layer_2(hidden),
             negative_slope=0.5
         )
 
-        output = F.softmax(
+        # hidden = F.relu(
+        #     self.hidden_layer_3(hidden)
+        # )
+        hidden = self.bn1(hidden)
+        output_ = F.softmax(
             self.out(hidden)
         )
+        #print(output_)
 
-        return output
+        #print(output.data.numpy().tolist())
+
+        return output_
 
 
 def save_model(network, path):
@@ -151,16 +165,14 @@ def train(trainset, batch_size, epoch, user_feature, product_feature, test_set, 
 
             labels = Variable(torch.LongTensor(labels))
             loss = loss_criterion(prob, labels)
-            if j % 2048:
-                print("Sample: %s: Loss: %s" % (j+1, loss.data[0]))
-
             training_optimizer.zero_grad()
             loss.backward()
-            # for param in network.user_layer.parameters():
-            #     print(param.grad)
+            for param in network.out.parameters():
+                print(param.grad)
             training_optimizer.step()
 
-
+            if j % 2048:
+                print("Sample: %s: Loss: %s" % (j + 1, loss.data[0]))
 
         # for data in trainset:
         #     person_id = data[0]
@@ -198,21 +210,23 @@ def train(trainset, batch_size, epoch, user_feature, product_feature, test_set, 
         #     training_optimizer.step()
         save_model(network, 'model_param/neural_network_param_%s' % i)
 
-        true_labels, result = test(test_set, user_feature, product_feature, 'model_param/neural_network_param_%s' % i)
+        true_labels, result = test(network, test_set, user_feature, product_feature, 'model_param/neural_network_param_%s' % i)
 
         evaluate(result, true_labels)
 
 
-def test(testset, user_feature, product_feature, model_path):
+def test(net, testset, user_feature, product_feature, model_path):
 
     network = load_model(model_path)
-
+    print(network)
     result = []
     labels = []
 
+    f = open('test.log', 'w+')
     for data in testset:
         person_id = data[0]
         product_id = data[1]
+        #print(person_id, product_id)
         label = data[-1]
 
         user_self_vector = user_feature[person_id][:8]
@@ -221,11 +235,11 @@ def test(testset, user_feature, product_feature, model_path):
         product_self_vector = product_feature[product_id][:6]
         product_desc_vector = product_feature[product_id][6]
 
-        user_self_vector = Variable(torch.FloatTensor(user_self_vector)).unsqueeze(0)
-        user_desc_vector = Variable(torch.FloatTensor(user_desc_vector)).unsqueeze(0)
+        user_self_vector = Variable(torch.FloatTensor([user_self_vector]))
+        user_desc_vector = Variable(torch.FloatTensor([user_desc_vector.tolist()]))
 
-        product_desc_vector = Variable(torch.FloatTensor(product_desc_vector)).unsqueeze(0)
-        product_self_vector = Variable(torch.FloatTensor(product_self_vector)).unsqueeze(0)
+        product_desc_vector = Variable(torch.FloatTensor([product_desc_vector.tolist()]))
+        product_self_vector = Variable(torch.FloatTensor([product_self_vector]))
 
         prob = network(
             product_vector=product_self_vector,
@@ -233,10 +247,14 @@ def test(testset, user_feature, product_feature, model_path):
             user_desc_vector=user_desc_vector,
             product_desc_vector=product_desc_vector
         )
+
         prob = prob.squeeze(0)
         prob = prob.data.numpy()
         labels.append(label)
         result.append(prob)
+        f.write('%s:%s\n' % (prob.tolist(), label))
+
+    f.close()
 
     return labels, result
 

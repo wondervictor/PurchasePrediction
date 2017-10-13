@@ -261,7 +261,7 @@ def sample_dataset(sample_num, dataset):
     return dataset
 
 
-def generate_dataset(testing_size):
+def generate_dataset_old(testing_size):
 
     buying_data = process_user_behaviors('data/behaviors/action_4.txt')
     notbuying_data = process_user_behaviors('data/behaviors/notbuying.txt')
@@ -314,14 +314,65 @@ def generate_dataset(testing_size):
     return train_data, test_data
 
 
+def generate_dataset(testing_size=20000):
+
+    buying_data = process_user_behaviors('data/behaviors/action_4.txt')
+    notbuying_data = process_user_behaviors('data/behaviors/notbuying.txt')
+
+    start_date = "2017-7-26 00:00:00"
+    end_date = "2017-8-22 23:59:59"
+
+    start_date = date_to_timestamp(start_date)
+    end_date = date_to_timestamp(end_date)
+    predict_start_date = "2017-8-23 0:0:0"
+    predict_end_date = "2017-8-25 23:59:59"
+    predict_end_date = date_to_timestamp(predict_end_date)
+    predict_start_date = date_to_timestamp(predict_start_date)
+
+    train_buying_data = filter_time(buying_data, start_date, end_date)
+    predict_buying_data = filter_time(buying_data, predict_start_date, predict_end_date)
+
+    train_nobuying_data = filter_time(notbuying_data, start_date, end_date)
+    predict_nobuying_data = filter_time(notbuying_data, predict_start_date, predict_end_date)
+
+    def add_label(label):
+        def func(x):
+            x.append(label)
+            return x
+
+        return func
+
+    pos_add_label = add_label(1)
+    neg_add_label = add_label(0)
+    train_buying_data = map(pos_add_label, train_buying_data)  # [x.append(1) for x in buying_data]
+    train_nobuying_data = map(neg_add_label, train_nobuying_data)  # [x.append(0) for x in notbuying_data]
+    # shuffle
+
+    random.shuffle(train_buying_data)
+    random.shuffle(train_nobuying_data)
+
+    predict_buying_data = map(pos_add_label, predict_buying_data)
+    predict_nobuying_data = map(neg_add_label, predict_nobuying_data)
+
+    random.shuffle(predict_buying_data)
+    random.shuffle(predict_nobuying_data)
+
+    train_data = train_buying_data + train_nobuying_data
+    predict_data = predict_nobuying_data + predict_buying_data
+
+    random.shuffle(train_data)
+    random.shuffle(predict_data)
+
+    return train_data, predict_data
+
 if __name__ == '__main__':
 
-    # train_data, test_data = generate_dataset(10000)
-    # print(len(train_data), len(test_data))
-    # write_to_file(train_data, 'data/train_data.txt')
-    # write_to_file(test_data, 'data/test_data.txt')
+    train_data, test_data = generate_dataset()
+    print(len(train_data), len(test_data))
+    write_to_file(train_data, 'data/train_data.txt')
+    write_to_file(test_data, 'data/test_data.txt')
 
 
-    split_five_days_3_behavior()
+    #split_five_days_3_behavior()
 
 
