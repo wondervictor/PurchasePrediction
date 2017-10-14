@@ -46,35 +46,41 @@ class XGB_Model(object):
 
 def train(train_set, test_set, user_dict, product_dict):
 
-
     train_data = []
     train_labels = []
     for i in range(len(train_set)):
         person_id = train_set[i][0]
         product_id = train_set[i][1]
+        if product_id not in product_dict or person_id not in user_dict:
+            continue
         train_labels.append(train_set[i][-1])
         train_data.append(user_dict[person_id][:-1]+product_dict[product_id][:-1])
 
     print("Generate Traing Data")
     model = XGB_Model()
     model.train(train_data, train_labels)
-    print("Training")
     del train_data
 
-    f = open('xgb_model_output.txt', 'w+')
-    correct = 0
-    nums = len(test_set)
-    for i in range(len(test_set)):
-        person_id = test_set[i][0]
-        product_id = test_set[i][1]
+
+def test(predict_recom_data, user_dict, product_dict):
+
+    model = xgb.Booster({'nthread':2})
+    model.load_model('model_param/xgb.model')
+
+    nums = len(predict_recom_data)
+    labels = []
+    preds = []
+    for i in range(len(predict_recom_data)):
+        person_id = predict_recom_data[i][0]
+        product_id = predict_recom_data[i][1]
         user = user_dict[person_id][:-1] + product_dict[product_id][:-1]
-        label = test_set[i][-1]
+        label = predict_recom_data[i][-1]
         prob_y = int(model.predict([user])[0])
-        if prob_y == label:
-            correct += 1
-        f.write("%s:%s\n" % (prob_y, label))
-    print("Correct: %s ACC:%s" % (correct, float(correct)/float(nums)))
-    f.close()
+        if label == 1:
+            labels.append((person_id, product_id))
+        if prob_y == 1:
+            preds.append((person_id, product_id))
+    return labels, preds
 
 
 def predict(predict_set, user_dict, product_dict):

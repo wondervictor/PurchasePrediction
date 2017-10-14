@@ -143,6 +143,8 @@ def split_five_days_3_behavior():
     behaviors = process_user_behaviors()
     seven_days = filter_time(behaviors, start_time, end_time)
     shopping_cart = filter_user_action(3, seven_days)
+    favorite_data = filter_user_action(2, seven_days)
+    shopping_cart = favorite_data + shopping_cart
     #purchased = filter_user_action(4, seven_days)
     # print("start to remove")
     # print(len(purchased), len(shopping_cart))
@@ -257,9 +259,7 @@ def collect_user_product(action):
     return user_product, product_freq
 
 
-
 # 构造训练集:
-
 # 采样
 def sample_dataset(sample_num, dataset):
     dataset_num = len(dataset)
@@ -327,20 +327,41 @@ def generate_dataset(testing_size=20000):
     notbuying_data = process_user_behaviors('data/behaviors/notbuying.txt')
 
     start_date = "2017-7-26 00:00:00"
-    end_date = "2017-8-22 23:59:59"
+    end_date = "2017-8-10 23:59:59"
 
     start_date = date_to_timestamp(start_date)
     end_date = date_to_timestamp(end_date)
-    predict_start_date = "2017-8-23 0:0:0"
-    predict_end_date = "2017-8-25 23:59:59"
+
+    train_buying_data = filter_time(buying_data, start_date, end_date)
+
+    train_nobuying_data = filter_time(notbuying_data, start_date, end_date)
+
+    predict_start_date = "2017-8-11 0:0:0"
+    predict_end_date = "2017-8-15 23:59:59"
+
     predict_end_date = date_to_timestamp(predict_end_date)
     predict_start_date = date_to_timestamp(predict_start_date)
 
-    train_buying_data = filter_time(buying_data, start_date, end_date)
-    predict_buying_data = filter_time(buying_data, predict_start_date, predict_end_date)
+    test_predict_recommendation_data = filter_time(buying_data, predict_start_date, predict_end_date) + \
+                                  filter_time(notbuying_data, predict_start_date, predict_end_date)
 
-    train_nobuying_data = filter_time(notbuying_data, start_date, end_date)
-    predict_nobuying_data = filter_time(notbuying_data, predict_start_date, predict_end_date)
+    predict_start_date = "2017-8-16 0:0:0"
+    predict_end_date = "2017-8-18 23:59:59"
+
+    predict_end_date = date_to_timestamp(predict_end_date)
+    predict_start_date = date_to_timestamp(predict_start_date)
+
+    test_predict_data = filter_time(buying_data, predict_start_date, predict_end_date)
+
+    start_date = "2017-8-19 00:00:00"
+    end_date = "2017-8-25 23:59:59"
+
+    start_date = date_to_timestamp(start_date)
+    end_date = date_to_timestamp(end_date)
+
+    train_buying_data += filter_time(buying_data, start_date, end_date)
+
+    train_nobuying_data += filter_time(notbuying_data, start_date, end_date)
 
     def add_label(label):
         def func(x):
@@ -358,28 +379,29 @@ def generate_dataset(testing_size=20000):
     random.shuffle(train_buying_data)
     random.shuffle(train_nobuying_data)
 
-    predict_buying_data = map(pos_add_label, predict_buying_data)
-    predict_nobuying_data = map(neg_add_label, predict_nobuying_data)
-
-    random.shuffle(predict_buying_data)
-    random.shuffle(predict_nobuying_data)
-
     train_data = train_buying_data + train_nobuying_data
-    predict_data = predict_nobuying_data + predict_buying_data
 
     random.shuffle(train_data)
-    random.shuffle(predict_data)
 
-    return train_data, predict_data
+    start_date = "2017-8-21 00:00:00"
+    end_date = "2017-8-25 23:59:59"
+
+    start_date = date_to_timestamp(start_date)
+    end_date = date_to_timestamp(end_date)
+
+    predict_recommentation_data = filter_time(buying_data+notbuying_data, start_date, end_date)
+
+    return train_data, test_predict_data, test_predict_recommendation_data, predict_recommentation_data
 
 
 if __name__ == '__main__':
-
-    train_data, test_data = generate_dataset()
-    print(len(train_data), len(test_data))
+    #
+    train_data, test_predict_data, test_predict_recom_data, predict_recom_data = generate_dataset()
+    print(len(train_data), len(test_predict_data), len(test_predict_recom_data), len(predict_recom_data))
     write_to_file(train_data, 'data/train_data.txt')
-    write_to_file(test_data, 'data/test_data.txt')
-
+    write_to_file(test_predict_recom_data, 'data/test_predict_recom_data.txt')
+    write_to_file(test_predict_data, 'data/test_predict_data.txt')
+    write_to_file(predict_recom_data, 'data/predict_data.txt')
 
     #split_five_days_3_behavior()
 

@@ -96,7 +96,8 @@ def load_dict():
 def prepare_training_data():
 
     trainset = load_dataset('data/train_data.txt')
-    testset = load_dataset('data/test_data.txt')
+    testset_recom = load_dataset('data/test_predict_recom_data.txt')
+    test_result = load_dataset('data/test_predict_data.txt')
 
     print("Finished Loading Dataset")
 
@@ -110,7 +111,7 @@ def prepare_training_data():
     product_file.close()
     print("Finished Loading Product Dict")
 
-    return trainset, testset, user_dict, product_dict
+    return trainset, testset_recom, test_result, product_dict, user_dict
 
 
 def prepare_dict():
@@ -146,11 +147,9 @@ if __name__ == '__main__':
 
     # prepare_dict()
 
-    trainset, testset, user_dict, product_dict = prepare_training_data()
+    trainset, testset_recom, test_result, user_dict, product_dict = prepare_training_data()
 
-    del trainset, testset
-
-    predict_set = load_dataset('data/predict.txt')
+    # predict_set = load_dataset('data/predict.txt')
     # print(user_dict[user_dict.keys()[1]])
     # print(product_dict[product_dict.keys()[1]])
     #for i in product_dict.keys()[185153:185185]:
@@ -161,6 +160,10 @@ if __name__ == '__main__':
     #labels, result = test(1, testset,user_feature=user_dict, product_feature=product_dict, model_path='model_param/neural_network_param_2')
     #evaluation.evaluate(result, labels)
 
-    #xgb_model.train(trainset, testset, user_dict, product_dict)
-    result = xgb_model.predict(predict_set, user_dict, product_dict)
-    output_result(result)
+    xgb_model.train(trainset, testset_recom, user_dict, product_dict)
+
+    labels, preds = xgb_model.test(testset_recom, user_dict, product_dict)
+    #result = xgb_model.predict(predict_set, user_dict, product_dict)
+    #output_result(result)
+
+    evaluation.fscore(labels, preds)
