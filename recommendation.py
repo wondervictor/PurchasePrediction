@@ -93,7 +93,7 @@ def cf_person_based(rank, user_dict):
     pass
 
 
-def gen_recommendation_data():
+def gen_recommendation_data1():
 
     predicted_data = []
 
@@ -137,4 +137,4 @@ def gen_recommendation_data():
 
 if __name__ == '__main__':
 
-    gen_recommendation_data()
+    #gen_recommendation_data()

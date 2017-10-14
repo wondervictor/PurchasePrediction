@@ -40,13 +40,10 @@ def extract_features_from_product(products, feature_dict):
             add_freq += 1
         if product[1] == 4:
             buy_freq += 1
-            
-        #     product_bought.append(product)
-        #     price.append(product_data[3])
-    # freq = len(product_bought)
+
         price.append(product_data[3])
     if freq == 0:
-        return 0
+        return [0]*7
     if buy_freq == 0:
         look_buy = 0
         favorite_buy = 0
@@ -62,7 +59,6 @@ def extract_features_from_product(products, feature_dict):
     feature = [ave_price, max_price, min_price, freq, look_buy, favorite_buy, add_buy]
     #discribe_vector = gen_product_embedding(all_discribes)
     feature.append(all_discribes)
-
 
     return feature
 
@@ -91,8 +87,6 @@ def build_user_features(user, products_dict, products_feature):
     
     #根据用户买的商品的信息作为特征
     feature_from_product = extract_features_from_product(products, products_feature)
-    if feature_from_product == 0:
-        return []
     feature = user_feature + feature_from_product
     return feature
 

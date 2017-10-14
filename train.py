@@ -12,7 +12,7 @@ if __name__ == "__main__":
     all_users = process_user_info()
     
     #读取action文件，将所有用户行为分成四类，存入一个长度为4的数组里，每个元素是以用户id为key的字典
-    behavior = get_all_behavior()
+    behavior, product_freq = get_all_behavior()
     
     #构建一个dict，每个key是用户id，内容是商品list（包含很多个商品），list中的每个元素是一个list[id, action],这个list会作为模型的输入
     priducts_dict = build_product_dict(all_users, behavior)
@@ -20,16 +20,16 @@ if __name__ == "__main__":
     #构建一个dict，每个key是商品id，value是商品的原始信息
     products_feature = get_products_feature()
     #
-    product_input = build_product_input(products_feature, behavior)
+    product_input = build_product_input(products_feature, behavior, product_freq)
     product_file = open("data/product_dict.pkl","wb")
-    product_dict = pickle.dump(product_input, product_file)
+    pickle.dump(product_input, product_file)
     product_file.close()
 
     #构建一个用户特征dict，这个特征将会作为模型的输入，将所有用户的特征构建成一个key为用户id的dict返回
-    # user_feature_dict = bulid_all_users_feature(all_users, priducts_dict, products_feature)
-    # user_file = open("data/user_dict.pkl",'wb')
-    # user_dict = pickle.dump(user_feature_dict, user_file)
-    # user_file.close()
+    user_feature_dict = bulid_all_users_feature(all_users, priducts_dict, products_feature)
+    user_file = open("data/user_dict.pkl",'wb')
+    pickle.dump(user_feature_dict, user_file)
+    user_file.close()
     
 
 

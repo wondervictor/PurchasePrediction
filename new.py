@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 
 from data_process import process_user_info, process_product_info
 from behavior_analysis import collect_user_product
@@ -15,6 +15,7 @@ def get_all_behavior():
     product_freq = [product_freq_1, product_freq_2, product_freq_3, product_freq_4]
     return behavior, product_freq
 
+
 def get_product_user_relation(user, behavior):
     
     """
@@ -26,28 +27,28 @@ def get_product_user_relation(user, behavior):
     try:
         products_1 = []
         for id_num in behavior[0][user.id]:
-            products_1.append([id_num,1])
+            products_1.append([id_num, 1])
         products += products_1
     except:
         pass    
     try:
         products_2 = []
         for id_num in behavior[1][user.id]:
-            products_2.append([id_num,2])
+            products_2.append([id_num, 2])
         products += products_2
     except:
         pass 
     try:
         products_3 = []
         for id_num in behavior[2][user.id]:
-            products_3.append([id_num,3])
+            products_3.append([id_num, 3])
         products += products_3
     except:
         pass 
     try:
         products_4= []
         for id_num in behavior[3][user.id]:
-            products_4.append([id_num,4])
+            products_4.append([id_num, 4])
         products += products_4
     except:
         pass 
@@ -66,6 +67,7 @@ def build_product_dict(all_users, behavior):
         products_by_user[id]=products
     print("build products list")
     return products_by_user
+
         
 def bulid_all_users_feature(all_users, products_dict, products_feature):
     """
@@ -76,7 +78,7 @@ def bulid_all_users_feature(all_users, products_dict, products_feature):
     for user in all_users:
         id = user.id
         i += 1
-        #构建的用户特征是一个长度为 的数组
+        # 构建的用户特征是一个长度为 的数组
         users_fearture[id] = build_user_features(user, products_dict, products_feature)
         print(i)
 

@@ -71,8 +71,6 @@ def generate_product_embedding(product_dict):
     return product_dict
 
 
-
-
 def load_dict():
 
     """
@@ -101,12 +99,12 @@ def prepare_training_data():
 
     print("Finished Loading Dataset")
 
-    user_file = open("data/user_dict_embedding.pkl",'rb')
+    user_file = open("data/user_dict.pkl",'rb')
     user_dict = pickle.load(user_file)
     user_file.close()
     print("Finished Loading User Dict")
 
-    product_file = open("data/product_dict_embedding.pkl","rb")
+    product_file = open("data/product_dict.pkl","rb")
     product_dict = pickle.load(product_file)
     product_file.close()
     print("Finished Loading Product Dict")
@@ -147,9 +145,14 @@ if __name__ == '__main__':
 
     # prepare_dict()
 
-    trainset, testset_recom, test_result, user_dict, product_dict = prepare_training_data()
+    trainset, testset_recom, test_result, product_dict, user_dict = prepare_training_data()
 
-    # predict_set = load_dataset('data/predict.txt')
+    predict_set = load_dataset('data/predict.txt')
+
+    #print(len(user_dict.keys()), len(product_dict.keys()))
+
+
+
     # print(user_dict[user_dict.keys()[1]])
     # print(product_dict[product_dict.keys()[1]])
     #for i in product_dict.keys()[185153:185185]:

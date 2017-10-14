@@ -50,7 +50,7 @@ def filter_user_action(action, data):
     """
 
     def _filter_(element):
-        if element[-1] == action:
+        if element[3] == action:
             return True
         else:
             return False
@@ -225,9 +225,9 @@ def not_buying():
 
     print("Finish Action 3: %s" % len(unpurchased_data))
 
-    unpurchased_data = former_3_days_data(unpurchased_data)
+    # unpurchased_data = former_3_days_data(unpurchased_data)
 
-    print("Not Buying: %s" % len(unpurchased_data))
+    # print("Not Buying: %s" % len(unpurchased_data))
 
     write_to_file(unpurchased_data, 'data/behaviors/notbuying.txt')
 
@@ -263,6 +263,8 @@ def collect_user_product(action):
 # 采样
 def sample_dataset(sample_num, dataset):
     dataset_num = len(dataset)
+    if dataset_num < sample_num:
+        sample_num = dataset_num
     sample_index = random.sample(range(dataset_num), sample_num)
     dataset = [dataset[p] for p in sample_index]
     return dataset
@@ -327,7 +329,7 @@ def generate_dataset(testing_size=20000):
     notbuying_data = process_user_behaviors('data/behaviors/notbuying.txt')
 
     start_date = "2017-7-26 00:00:00"
-    end_date = "2017-8-10 23:59:59"
+    end_date = "2017-8-9 23:59:59"
 
     start_date = date_to_timestamp(start_date)
     end_date = date_to_timestamp(end_date)
@@ -336,7 +338,7 @@ def generate_dataset(testing_size=20000):
 
     train_nobuying_data = filter_time(notbuying_data, start_date, end_date)
 
-    predict_start_date = "2017-8-11 0:0:0"
+    predict_start_date = "2017-8-10 0:0:0"
     predict_end_date = "2017-8-15 23:59:59"
 
     predict_end_date = date_to_timestamp(predict_end_date)
@@ -352,9 +354,8 @@ def generate_dataset(testing_size=20000):
     predict_start_date = date_to_timestamp(predict_start_date)
 
     test_predict_data = filter_time(buying_data, predict_start_date, predict_end_date)
-
     start_date = "2017-8-19 00:00:00"
-    end_date = "2017-8-25 23:59:59"
+    end_date = "2017-8-19 23:59:59"
 
     start_date = date_to_timestamp(start_date)
     end_date = date_to_timestamp(end_date)
@@ -379,11 +380,31 @@ def generate_dataset(testing_size=20000):
     random.shuffle(train_buying_data)
     random.shuffle(train_nobuying_data)
 
-    train_data = train_buying_data + train_nobuying_data
+    pos_num = len(train_buying_data)
+
+    notbuying_action_1 = filter_user_action(1, train_nobuying_data)
+    notbuying_action_2 = filter_user_action(2, train_nobuying_data)
+    notbuying_action_3 = filter_user_action(3, train_nobuying_data)
+
+    act_1_num = len(notbuying_action_1)
+    act_2_num = len(notbuying_action_2)
+    act_3_num = len(notbuying_action_3)
+
+    print(act_3_num, act_1_num, act_2_num)
+
+    sample_1_num = 2*pos_num * act_1_num / (act_1_num + act_2_num + act_3_num)
+    sample_2_num = 4*pos_num * act_2_num / (act_1_num + act_2_num + act_3_num)
+    sample_3_num = 8*pos_num * act_3_num / (act_1_num + act_2_num + act_3_num)
+
+    notbuying_action_1 = sample_dataset(sample_1_num, notbuying_action_1)
+    notbuying_action_2 = sample_dataset(sample_2_num, notbuying_action_2)
+    notbuying_action_3 = sample_dataset(sample_3_num, notbuying_action_3)
+
+    train_data = notbuying_action_1 + notbuying_action_2 + notbuying_action_3 + train_buying_data
 
     random.shuffle(train_data)
 
-    start_date = "2017-8-21 00:00:00"
+    start_date = "2017-8-20 00:00:00"
     end_date = "2017-8-25 23:59:59"
 
     start_date = date_to_timestamp(start_date)
