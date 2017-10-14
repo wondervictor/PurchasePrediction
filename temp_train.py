@@ -20,7 +20,7 @@ USER_VECTOR_SIZE = 8
 PRODUCT_VECTOR_SIZE = 6
 
 class NeuralNetwork(nn.Module):
-
+    
     def __init__(self):
 
         super(NeuralNetwork, self).__init__()
@@ -28,18 +28,18 @@ class NeuralNetwork(nn.Module):
         # self.user_merchandise_layer = nn.Linear(512, 512)
         self.user_self_layer = nn.Linear(USER_VECTOR_SIZE, 64)
         self.bn1 = nn.BatchNorm1d(64)
-
+        
         # self.merchandise_description_layer = nn.Linear(512, 512)
         self.merchandise_self_layer = nn.Linear(PRODUCT_VECTOR_SIZE, 64)
         self.bn2 = nn.BatchNorm1d(64)
-
+        
         self.user_layer = nn.Linear(64, 128)
         self.bn3 = nn.BatchNorm1d(128)
         self.merchandise_layer = nn.Linear(64, 128)
         self.bn4 = nn.BatchNorm1d(128)
 
         self.hidden_layer_1 = nn.Linear(256, 256)
-
+        
         self.hidden_layer_2 = nn.Linear(256, 32)
         self.bn5 = nn.BatchNorm1d(32)
 
@@ -63,6 +63,7 @@ class NeuralNetwork(nn.Module):
             self.merchandise_layer(merchandise_self),
             negative_slope=0.2
         )
+        merchandise_layer = self.bn4(merchandise_layer)
 
         hidden = F.leaky_relu(
             self.hidden_layer_1(torch.cat([user_layer, merchandise_layer], dim=1)),
@@ -152,7 +153,7 @@ def train(trainset, batch_size, epoch, user_feature, product_feature):
             user_self_vector = []
             product_self_vector = []
             labels = []
-
+        
             for p in range(batch_size):
                 person_id = trainset[p+j][0]
                 product_id = trainset[p+j][1]
@@ -187,7 +188,7 @@ def train(trainset, batch_size, epoch, user_feature, product_feature):
             training_optimizer.step()
         print("loss: %s", epoch_loss/float(temp))
 
-        save_model(network, './model_param/deep1_neural_network_param_%s' % i)
+        save_model(network, './model_param/deep1_neural_network_param_%s.pkl' % i)
 
 
 def test(testset, user_feature, product_feature, model_path):
@@ -237,6 +238,7 @@ def predict(predict_set, user_feature, product_feature, model_path):
         )
         prob = prob.squeeze(0)
         prob = prob.data.numpy()
+
         if prob[0] < prob[1]:
             result.append((person_id, product_id))
 
