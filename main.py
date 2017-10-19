@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-
-
-
+Main
 """
 import pickle
 import torch
@@ -16,6 +14,7 @@ import evaluation
 from model import xgb_model
 from output import output_result
 from product_analysis import gen_product_embedding
+from model import svm, random_forest, descision_tree
 
 
 DICT_DIM = 53900
@@ -92,6 +91,9 @@ def load_dict():
 
 
 def prepare_training_data():
+    """
+    准备训练数据
+    """
 
     trainset = load_dataset('data/train_data.txt')
     testset_recom = load_dataset('data/test_predict_recom_data.txt')
@@ -113,60 +115,50 @@ def prepare_training_data():
 
 
 def prepare_dict():
-
+    """
+    Generate Embedding-User from User Dict 
+    """
 
     user_file = open("data/user_dict.pkl",'rb')
     user_dict = pickle.load(user_file)
     user_file.close()
     print("Finished Loading User Dict")
 
-    # product_file = open("data/product_dict.pkl","rb")
-    # product_dict = pickle.load(product_file)
-    # product_file.close()
-    # print("Finished Loading Product Dict")
+    product_file = open("data/product_dict.pkl","rb")
+    product_dict = pickle.load(product_file)
+    product_file.close()
+    print("Finished Loading Product Dict")
 
-    #product_dict = generate_product_embedding(product_dict)
+    product_dict = generate_product_embedding(product_dict)
     user_dict = generate_user_embedding(user_dict)
 
-    #print(product_dict[product_dict.keys[0]])
 
 
     user_file = open("data/user_dict_embedding.pkl",'wb')
     pickle.dump(user_dict, user_file)
     user_file.close()
-    #
-    # user_file = open("data/product_dict_embedding.pkl",'wb')
-    # pickle.dump(product_dict, user_file)
-    # user_file.close()
+    
+    user_file = open("data/product_dict_embedding.pkl",'wb')
+    pickle.dump(product_dict, user_file)
+    user_file.close()
     print("Saved")
 
 
 if __name__ == '__main__':
 
-    # prepare_dict()
-
     trainset, testset_recom, test_result, product_dict, user_dict = prepare_training_data()
-
     predict_set = load_dataset('data/predict.txt')
+    predict_recom_set = load_dataset('data/recom.txt')
 
-    #print(len(user_dict.keys()), len(product_dict.keys()))
+    predict_set = predict_set + predict_recom_set
 
-
-
-    # print(user_dict[user_dict.keys()[1]])
-    # print(product_dict[product_dict.keys()[1]])
-    #for i in product_dict.keys()[185153:185185]:
-    #    print(product_dict[i])
-    #print(len(trainset))
-    #eva = evaluation.evaluate
-    #train(trainset, batch_size=128, epoch=10, user_feature=user_dict, product_feature=product_dict, test_set=testset, evaluate=eva)
-    #labels, result = test(1, testset,user_feature=user_dict, product_feature=product_dict, model_path='model_param/neural_network_param_2')
-    #evaluation.evaluate(result, labels)
-
-    xgb_model.train(trainset, testset_recom, user_dict, product_dict)
-
-    labels, preds = xgb_model.test(testset_recom, user_dict, product_dict)
-    #result = xgb_model.predict(predict_set, user_dict, product_dict)
-    #output_result(result)
-
+    # 使用SVM训练
+    svm.train_svm(trainset, user_dict, product_dict)
+    labels, preds = svm.test(testset_recom, user_dict, product_dict)
     evaluation.fscore(labels, preds)
+    result = svm.predict(predict_set, user_dict, product_dict)
+    output_result(result)
+
+
+
+

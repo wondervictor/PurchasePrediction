@@ -22,7 +22,7 @@ def fscore(truth, pred):
 
     common = 0
     for i in range(len(pred)):
-        if pred[i] in truth_map and pred[i] != 0:
+        if pred[i] in truth_map and truth_map[pred[i]] != 0:
             common += 1
             truth_map[pred[i]] -= 1
 

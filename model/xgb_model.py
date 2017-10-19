@@ -9,7 +9,6 @@ from xgboost.sklearn import XGBClassifier
 
 class XGB_Model(object):
 
-
     def __init__(self):
 
         self.params = {

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import warnings
-warnings.filterwarnings(action='ignore',category=UserWarning,module='gensim')
+# import warnings
+# warnings.filterwarnings(action='ignore',category=UserWarning,module='gensim')
 import logging
 import os.path
 import sys
@@ -8,13 +8,12 @@ import multiprocessing
 # from gensim.models.word2vec import LineSentence
 # from gensim.models import Word2Vec
 import numpy as np
+import math
+import output
 from scipy.spatial.distance import cosine
 from data_process import process_user_info
-from behavior_analysis import process_user_behaviors, filter_time, write_to_file, date_to_timestamp
+from behavior_analysis import process_user_behaviors, filter_time, write_to_file, date_to_timestamp, get_user_products
 from product_analysis import get_similarity
-
-
-
 
 
 
@@ -70,27 +69,67 @@ def cf_product_based(all_products, user_product):
     pass
 
 
-def cf_person_based(rank, user_dict):
+def cf_person_based(k=4, num_user=10):
     """
     基于人的协同过滤
-    :rank: 选取rank名相似用户进行推荐
+    :param k k名相似
     :return:
     """
-    def sim(person_a, person_b):
 
-        return 0
+    user_purchased = get_user_products()
 
-    users = process_user_info()
+    product_user_relation = dict()
 
-    num_user = len(users)
+    for user, item in user_purchased.items():
+        for i in item.keys():
+            if i not in product_user_relation:
+                product_user_relation[i] = set()
+            product_user_relation[i].add(user)
 
-    person_similarity_matrix = np.zeros((num_user, num_user))
+    C = dict()
+    N = dict()
+    for i, users in product_user_relation.items():
 
-    for i in range(num_user):
-        for j in range(num_user):
-            person_similarity_matrix[i][j] = sim(user_dict[users[i].user_id], user_dict[users[j].user_id])
+        for u in users:
+            N.setdefault(u, 0)
+            N[u] += 1
+            C.setdefault(u, {})
 
-    pass
+            for v in users:
+                if u == v:
+                    continue
+                C[u].setdefault(v, 0)
+                C[u][v] += 1
+    W = dict()
+
+    for u, relate_users in C.items():
+        W.setdefault(u, {})
+        for v, cuv in relate_users.items():
+            W[u][v] = cuv / math.sqrt(N[u]*N[v])
+
+    recommend_list = []
+
+    print("Starting to recommend")
+
+    for user in user_purchased.keys():
+        rank = dict()
+        action_item = user_purchased[user].keys()
+        for v, wuv in sorted(W[user].items(), key=lambda x: x[1], reverse=True)[0:k]:
+
+            for i, rvi in user_purchased[v].items():
+                if i in action_item:
+                    continue
+                rank.setdefault(i, 0)
+                rank[i] += wuv*rvi
+
+        recom_dict = dict(sorted(rank.items(), key=lambda x: x[1], reverse=True)[0:num_user])
+
+        recom_products = [(user, product) for product in recom_dict.keys()]
+
+        recommend_list += recom_products
+
+    print(len(recommend_list))
+    output.output_result_path(recommend_list, 'data/recom.txt')
 
 
 def gen_recommendation_data1():
@@ -138,3 +177,5 @@ def gen_recommendation_data1():
 if __name__ == '__main__':
 
     #gen_recommendation_data()
+
+    cf_person_based()

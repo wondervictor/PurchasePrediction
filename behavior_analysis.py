@@ -404,7 +404,7 @@ def generate_dataset(testing_size=20000):
 
     random.shuffle(train_data)
 
-    start_date = "2017-8-20 00:00:00"
+    start_date = "2017-8-19 00:00:00"
     end_date = "2017-8-25 23:59:59"
 
     start_date = date_to_timestamp(start_date)
@@ -413,6 +413,39 @@ def generate_dataset(testing_size=20000):
     predict_recommentation_data = filter_time(buying_data+notbuying_data, start_date, end_date)
 
     return train_data, test_predict_data, test_predict_recommendation_data, predict_recommentation_data
+
+
+def get_user_products():
+
+    products = process_user_behaviors('data/behaviors/action_4.txt')
+    products += process_user_behaviors('data/behaviors/action_3.txt')
+    products += process_user_behaviors('data/behaviors/action_2.txt')
+
+    start_date = '2017-8-20 0:0:0'
+    end_date = '2017-8-25 23:59:59'
+
+    start_date = date_to_timestamp(start_date)
+    end_date = date_to_timestamp(end_date)
+
+    products = filter_time(products, start_date, end_date)
+
+    users = {}
+
+    print("Generate User Purchased")
+    for one in products:
+        user_id = one[0]
+        product_id = one[1]
+        action = one[-1]
+
+        if user_id not in users:
+            users[user_id] = {}
+        if product_id not in users[user_id]:
+            users[user_id][product_id] = 0
+
+        users[user_id][product_id] += action*10
+    print("Finish Generate User Purchased")
+
+    return users
 
 
 if __name__ == '__main__':

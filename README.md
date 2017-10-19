@@ -1,26 +1,43 @@
 # Purchase Prediction
 
+> 2017 Seed Cup Semi-Final Competition
 
-### TODO
 
-- [x] 构造分类器 (Random Forest/XGBoost)
+## Introduction
 
-- [ ] 可视化 (数量versus价格、商品数versus销量)
+1. Firstly, we need to extract **inherent features** and of users and products. Furtherly, we extracted **behavioural features** of users and the **interactive features** of products all from user's behaviors
 
-- [x] 商家评价
+2. We developed an **User-Product Purchasing Model**
 
-- [x] 用户特征(购买商品/固有特征)
+![](images/model.png)
 
-- [x] 清理无人购买的商品 (func: remove_unactive())
+3. We adopt user-based and product-based collaborative filtering to generate recommend products for users
 
-- [ ] 基于人的协同过滤
+![](images/recommende.png)
 
-- [ ] 基于商品的协同过滤
+## Contributors
 
-- [x] 拆分训练数据和测试数据
+[Vic Chan](https://github.com/wondervictor)
+[Yifan Jiang](https://github.com/yueruchen)
+[Xiangru Tang](https://github.com/tangxiangru)
 
-- [x] 物品特征提取
+## Environment
 
-- [x] 提取商品负例
+* macOS 10.14 High Sierra
 
-- [x] 分词提取
+* Python 2.7.10 
+
+* XGBoost
+
+* Pytorch
+
+* Scikit-Learn
+
+## Statement
+
+**The code commited on this repository might not work much well as expected, because we adopted many intermediate steps and operations to collect the best result!**
+
+## Licence
+
+This project is under the **MIT Licence**
+

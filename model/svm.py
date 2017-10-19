@@ -1,22 +1,9 @@
 # -*- coding: utf-8 -*-
 
-"""
-Training Model: Random Forest
-
-"""
-
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import *
 from sklearn.externals import joblib
 
-
-def train_random_forest(train_set, user_dict, product_dict):
-
-    forest = RandomForestClassifier(
-        n_estimators=10,
-        criterion='entropy',
-        random_state=101,
-        n_jobs=2
-    )
+def train_svm(train_set, user_dict, product_dict):
 
     train_data = []
     train_labels = []
@@ -31,18 +18,24 @@ def train_random_forest(train_set, user_dict, product_dict):
         train_data.append(user_dict[person_id][:-1]+product_dict[product_id][:-1])
     print("Generate Traing Data")
 
-    forest.fit(train_data, train_labels)
+    svm = SVC(
+        max_iter=10000,
+        kernel='rbf',
+        C=1.0,
+        gamma=100.0
+    )
 
-    joblib.dump(forest, 'model_param/random_forest.model')
+    svm.fit(train_data, train_labels)
+
+    joblib.dump(svm, 'model_param/svm.model')
 
 
-def test_forest(test_set, user_dict, product_dict):
-
+def test(test_set, user_dict, product_dict):
 
     labels = []
     preds = []
 
-    model = joblib.load('model_param/random_forest.model')
+    model = joblib.load('model_param/svm.model')
 
     for i in range(len(test_set)):
         person_id = test_set[i][0]
@@ -51,7 +44,6 @@ def test_forest(test_set, user_dict, product_dict):
             continue
         user = user_dict[person_id][:-1] + product_dict[product_id][:-1]
         label = test_set[i][-1]
-        #print(model.predict([user]))
         prob_y = int(model.predict([user])[0])
         if label == 1:
             labels.append((person_id, product_id))
@@ -60,9 +52,9 @@ def test_forest(test_set, user_dict, product_dict):
     return labels, preds
 
 
-def predict_forest(predict_set, user_dict, product_dict):
+def predict(predict_set, user_dict, product_dict):
 
-    model = joblib.load('model_param/random_forest.model')
+    model = joblib.load('model_param/svm.model')
 
     nums = len(predict_set)
 
@@ -83,8 +75,6 @@ def predict_forest(predict_set, user_dict, product_dict):
             result.append([person_id, product_id])
     print(counter)
     return result
-
-
 
 
 
