@@ -15,12 +15,6 @@
 
 ![](images/recommende.png)
 
-## Contributors
-
-[Vic Chan](https://github.com/wondervictor)
-[Yifan Jiang](https://github.com/yueruchen)
-[Xiangru Tang](https://github.com/tangxiangru)
-
 ## Environment
 
 * macOS 10.14 High Sierra
